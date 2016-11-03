@@ -120,12 +120,12 @@ public class MainController {
                     e.printStackTrace();
                 }
                 root.getScene().getWindow().setOnHiding(event -> {
-                    ConfigurationFile save = new ConfigurationFile("config.ser", _this);
+                   /* ConfigurationFile save = new ConfigurationFile("config.xml", _this);
                     try {
                         save.save();
                     } catch(IOException e) {
                         e.printStackTrace();
-                    }
+                    }*/
                 });
 
                 return null;
@@ -137,12 +137,9 @@ public class MainController {
 
         // Load configuration file
         try {
-            ConfigurationFile loader = load("config.ser");
+            ConfigurationFile loader = new ConfigurationFile("config.xml", this);
             loader.load();
         } catch (FileNotFoundException e) {}
-        catch(InvalidClassException ice) {
-            new File("config.ser").delete();
-        }
         catch(IOException ie) {
             Alert a = new Alert(Alert.AlertType.ERROR);
             a.setTitle("AVRConfig");

@@ -414,7 +414,7 @@
                </children>
             </VBox>
          </content></Tab>
-      <Tab text="Single fuse &amp; fuseN bits">
+     <!-- <Tab text="Single fuse &amp; fuseN bits">
          <content>
             <VBox alignment="CENTER" spacing="5.0">
                <children>
@@ -525,7 +525,7 @@
                </children>
             </VBox>
          </content>
-      </Tab>
+      </Tab> -->
       <Tab text="Lock bits">
          <content>
             <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
