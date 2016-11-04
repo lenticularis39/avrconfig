@@ -19,8 +19,8 @@ import java.io.*;
 
 public class ConfigurationFile {
 
-    transient String filename;
-    transient public MainController s;
+    String filename;
+    public MainController s;
 
     public ConfigurationFile(String filename, MainController s)  {
         this.filename = filename;
