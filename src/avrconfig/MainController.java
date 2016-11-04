@@ -120,12 +120,12 @@ public class MainController {
                     e.printStackTrace();
                 }
                 root.getScene().getWindow().setOnHiding(event -> {
-                   /* ConfigurationFile save = new ConfigurationFile("config.xml", _this);
+                    ConfigurationFile save = new ConfigurationFile("config.xml", _this);
                     try {
                         save.save();
                     } catch(IOException e) {
                         e.printStackTrace();
-                    }*/
+                    }
                 });
 
                 return null;

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<config>
+   <textfield id="execTextField">/usr/bin/avrdude</textfield>
+   <choicebox id="readFormatChoiceBox">Intel HEX<choice>Intel HEX</choice>
+      <choice>Motorola S-record</choice>
+      <choice>Raw binary</choice>
+      <choice>ELF</choice>
+      <choice>Decimal</choice>
+      <choice>Hexadecimal</choice>
+      <choice>Binary</choice>
+      <choice>Octal</choice>
+   </choicebox>
+   <choicebox id="readFormatChoiceBoxEEPROM">Intel HEX<choice>Intel HEX</choice>
+      <choice>Motorola S-record</choice>
+      <choice>Raw binary</choice>
+      <choice>ELF</choice>
+      <choice>Decimal</choice>
+      <choice>Hexadecimal</choice>
+      <choice>Binary</choice>
+      <choice>Octal</choice>
+   </choicebox>
+</config>

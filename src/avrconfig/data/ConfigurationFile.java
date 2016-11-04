@@ -1,65 +1,45 @@
 package avrconfig.data;
 
 import avrconfig.MainController;
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.NodeType;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.*;
 
-import javax.xml.*;
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.lang.reflect.*;
-import java.util.List;
-import java.util.stream.Stream;
 import java.io.*;
 
-public class ConfigurationFile implements Serializable {
-    /*Hashtable<String, String> chips;
-    String selectedChip;
-    Hashtable<String, String> programmers;
-    String selectedProgrammer;
-    String execPath;
-    String configPath;
-    String port;
-    String baudrate;*/
+public class ConfigurationFile {
 
     transient String filename;
     transient public MainController s;
 
     public ConfigurationFile(String filename, MainController s)  {
         this.filename = filename;
-        /*chips = s.chips;
-        programmers = s.programmers;
-        execPath = s.execTextField.getText();
-        configPath = s.configTextField.getText();
-        selectedChip = (String)s.microcontrollerChoiceBox.getValue();
-        selectedProgrammer = (String)s.programmersChoiceBox.getValue();
-        port = s.portTextField.getText();
-        baudrate = s.baudrateTextField.getText();*/
         this.s = s;
     }
 
+    private String getFirstLevelTextContent(Node node) {
+        NodeList list = node.getChildNodes();
+        StringBuilder s = new StringBuilder();
+        for (int i = 0; i < list.getLength(); ++i) {
+            Node child = list.item(i);
+            if ((child.getNodeType() == Node.TEXT_NODE) && !child.getTextContent().matches("\\s+")) {
+                s.append(child.getTextContent());
+            }
+        }
+        return s.toString();
+    }
+
     public void load() throws IOException {
-        /*s.chips = this.chips;
-        s.programmers = this.programmers;
-        s.updateLists();
-        s.execTextField.setText(this.execPath);
-        s.configTextField.setText(this.configPath);
-        s.microcontrollerChoiceBox.setValue(this.selectedChip);
-        s.programmersChoiceBox.setValue(this.selectedProgrammer);
-        s.portTextField.setText(this.port);
-        s.baudrateTextField.setText(this.baudrate);*/
         try {
             // Load DOM document and normalize it
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -76,14 +56,13 @@ public class ConfigurationFile implements Serializable {
             NodeList childNodes = rootElement.getChildNodes();
             for(int i = 0; i < childNodes.getLength(); i++) {
                 if(childNodes.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                    System.out.println("Detected element node!");
                     Element e = (Element)childNodes.item(i);
 
                     // Text fields
                     if(e.hasAttribute("id") && e.getNodeName().equals("textfield")) {
                         for(Field f : fields) {
                             if(f.getName().equals(e.getAttribute("id"))) {
-                                ((TextField)f.get(s)).setText(e.getTextContent());
+                                ((TextField)f.get(s)).setText(getFirstLevelTextContent(e));
                             }
                         }
                     }
@@ -92,7 +71,18 @@ public class ConfigurationFile implements Serializable {
                     if(e.hasAttribute("id") && e.getNodeName().equals("choicebox")) {
                         for(Field f : fields) {
                             if(f.getName().equals(e.getAttribute("id"))) {
-                                ((ChoiceBox)f.get(s)).setValue(e.getTextContent());
+                                ((ChoiceBox)f.get(s)).setValue(getFirstLevelTextContent(e));
+
+                                // Iterate over choices and set them
+                                NodeList children = e.getChildNodes();
+                                ObservableList<String> list = FXCollections.observableArrayList();
+                                for(int j = 0; j < children.getLength(); j++) {
+                                    if(children.item(j).getNodeType() == Node.ELEMENT_NODE) {
+                                        list.add(children.item(j).getTextContent());
+                                    }
+                                }
+                                ((ChoiceBox)f.get(s)).setItems(list);
+
                             }
                         }
                     }
@@ -109,9 +99,7 @@ public class ConfigurationFile implements Serializable {
             }
 
 
-        } catch (SAXException se) {se.printStackTrace();}
-          catch(ParserConfigurationException pce) {pce.printStackTrace();}
-          catch(IllegalAccessException iae) {iae.printStackTrace();}
+        } catch (SAXException | ParserConfigurationException | IllegalAccessException se) {se.printStackTrace();}
     }
 
     public void save() throws IOException {
@@ -136,12 +124,22 @@ public class ConfigurationFile implements Serializable {
                 }
 
                 // Choice boxes
-                if(f.getType().equals(ChoiceBox.class)) {
+                if(f.getType().equals(ChoiceBox.class) && !f.getName().matches("readFormat.*")) {
                     Object value = ((ChoiceBox)f.get(s)).getValue();
                     if(value != null && !value.equals("")) {
                         Element e = xml.createElement("choicebox");
                         e.setAttribute("id", f.getName());
-                        e.setTextContent(value.toString());
+                        e.appendChild(xml.createTextNode(value.toString()));
+
+                        // Iterate over choices
+                        ObservableList<Object> items = ((ChoiceBox)f.get(s)).getItems();
+
+                        for(Object item : items) {
+                            Element child = xml.createElement("choice");
+                            child.appendChild(xml.createTextNode(item.toString()));
+                            e.appendChild(child);
+                        }
+
                         rootElement.appendChild(e);
                     }
                 }
@@ -150,7 +148,7 @@ public class ConfigurationFile implements Serializable {
                 if(f.getType().equals(CheckBox.class)) {
                     boolean value = ((CheckBox)f.get(s)).isSelected();
 
-                    Element e = xml.createElement("choicebox");
+                    Element e = xml.createElement("checkbox");
                     e.setAttribute("id", f.getName());
 
                     if(value) {
