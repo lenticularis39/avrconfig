@@ -12,7 +12,7 @@ public class ConfigParser {
             throw new IllegalArgumentException("File does not exist.");
     }
 
-    public Hashtable<String, String> parse(String keyword) throws FileNotFoundException, IOException {
+    public Hashtable<String, String> parse(String keyword) throws IOException {
         // Open file and create hashtable
         BufferedReader avrdudeConfigReader = new BufferedReader(new FileReader(configFile));
         Hashtable<String, String> returner = new Hashtable<>(500);

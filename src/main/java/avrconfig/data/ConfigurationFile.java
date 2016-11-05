@@ -1,6 +1,7 @@
 package avrconfig.data;
 
 import avrconfig.MainController;
+import avrconfig.error.ErrorHandler;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
@@ -164,9 +165,14 @@ public class ConfigurationFile {
             StreamResult result = new StreamResult(new File(filename));
 
             transformer.transform(new DOMSource(xml), result);
-        } catch (IllegalAccessException iae) {iae.printStackTrace();}
-          catch(ParserConfigurationException pce) {pce.printStackTrace();}
-          catch(TransformerConfigurationException tce) {tce.printStackTrace();}
-        catch(TransformerException te) {te.printStackTrace();}
+        } catch(IllegalAccessException | ParserConfigurationException e) {
+            // Something is wrong with the program.
+            ErrorHandler.alertBug(e);
+        }
+        catch(TransformerException e) {
+            if(e.getMessage().startsWith("java.io.FileNotFoundException"))
+                throw new IOException(e.getMessage());
+            else ErrorHandler.alertBug(e);
+        }
     }
 }

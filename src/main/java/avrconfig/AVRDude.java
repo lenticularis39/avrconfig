@@ -1,5 +1,6 @@
 package avrconfig;
 
+import avrconfig.error.ErrorHandler;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
@@ -153,10 +154,7 @@ public class AVRDude {
                 updateTextAreaThread2.start();
             }
         } catch(IOException e) {
-            Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setTitle("AVRConfig");
-            a.setHeaderText("Cannot execute avrdude.");
-            a.showAndWait();
+            ErrorHandler.alert("Cannot execute avrdude.", "Please check the path to the avrdude binary.");
         }
     }
 

@@ -5,6 +5,7 @@ import java.util.*;
 
 import avrconfig.data.ConfigParser;
 import avrconfig.data.ConfigurationFile;
+import avrconfig.error.ErrorHandler;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -13,7 +14,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.*;
-
 
 public class MainController {
     @FXML
@@ -108,23 +108,26 @@ public class MainController {
     }
 
     @FXML
-    public void initialize() throws ClassNotFoundException {
+    public void initialize()  {
         // Set up saving configuration file on closing
         MainController _this = this;
+
         Task setSave = new Task<Void>() {
             @Override
             protected Void call() {
                 try {
                     Thread.sleep(1000);
                 } catch(InterruptedException e) {
-                    e.printStackTrace();
+                    ErrorHandler.alertBug(e);
                 }
                 root.getScene().getWindow().setOnHiding(event -> {
                     ConfigurationFile save = new ConfigurationFile("config.xml", _this);
                     try {
                         save.save();
                     } catch(IOException e) {
-                        e.printStackTrace();
+                        // Cannot write to file
+                        ErrorHandler.alert("Cannot save configuration file.", "AVRConfig couldn't write into the configuration file. " +
+                                "Please check if you have sufficient permissions.");
                     }
                 });
 
@@ -139,14 +142,12 @@ public class MainController {
         try {
             ConfigurationFile loader = new ConfigurationFile("config.xml", this);
             loader.load();
-        } catch (FileNotFoundException e) {}
+        } catch (FileNotFoundException e) {
+            // The file does not exist, a new file will be created
+        }
         catch(IOException ie) {
-            Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setTitle("AVRConfig");
-            a.setHeaderText("Cannot load configuration file.");
-            a.setContentText("config.ser exists, but cannot be read.");
-            a.showAndWait();
-            ie.printStackTrace();
+            ErrorHandler.alert("Cannot load configuration file.", "config.xml exists, but cannot be read. " +
+                    "The filesystem is no longer available or corrupted.");
         }
 
         // Set read formats
@@ -214,30 +215,27 @@ public class MainController {
             writeEEPROMTextField.setText(f.getPath());
     }
 
-    public void setupButtonClicked() throws IOException {
+    public void setupButtonClicked() {
         // First check if the files exist
         File avrdudeExe = new File(execTextField.getText());
         File avrdudeConfig = new File(configTextField.getText());
 
         if (!avrdudeExe.exists() || !avrdudeExe.canExecute()) {
-            Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setTitle("AVRConfig");
-            a.setHeaderText("Cannot find or execute avrdude.");
-            a.setContentText("The file " + execTextField.getText() + " either does not exist, or cannot be executed.");
-            a.showAndWait();
+            ErrorHandler.alert("Cannot find or execute avrdude.", "The file " + execTextField.getText() +
+                    " either does not exist, or cannot be executed.");
             return;
         } else if (!avrdudeConfig.exists()) {
-            Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setTitle("AVRConfig");
-            a.setHeaderText("Cannot find avrdude configuration file.");
-            a.setContentText("The file " + configTextField.getText() + " has not been found.");
-            a.showAndWait();
+            ErrorHandler.alert("Cannot find avrdude configuration file.", "The file " + configTextField.getText() + " has not been found.");
             return;
         }
 
-        ConfigParser cp = new ConfigParser(avrdudeConfig);
-        chips = cp.parse("part");
-        programmers = cp.parse("programmer");
+        try {
+            ConfigParser cp = new ConfigParser(avrdudeConfig);
+            chips = cp.parse("part");
+            programmers = cp.parse("programmer");
+        } catch(IOException e) {
+            ErrorHandler.alert("Cannot read avrdude configuration file.", "The filesystem is no longer available or corrupted.");
+        }
 
         updateLists();
     }
@@ -514,20 +512,10 @@ public class MainController {
         ArrayList<String> parameters = new ArrayList<>();
 
         parameters.add("-e");
-        if(overrideSignatureCheckOther.isSelected()) {
+        if (overrideSignatureCheckOther.isSelected()) {
             parameters.add("-F");
         }
 
         avrDude.run(parameters);
     }
-
-    public ConfigurationFile load(String filename) throws IOException, ClassNotFoundException {
-        FileInputStream i = new FileInputStream(filename);
-        ObjectInputStream ser = new ObjectInputStream(i);
-        ConfigurationFile ret = (ConfigurationFile) ser.readObject();
-        ret.s = this;
-        ser.close();
-        return ret;
-    }
-
 }
