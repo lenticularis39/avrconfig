@@ -6,7 +6,7 @@
 
     <groupId>groupId</groupId>
     <artifactId>avrconfig</artifactId>
-    <version>0.1pre2</version>
+    <version>0.1</version>
     <build>
         <plugins>
             <plugin>

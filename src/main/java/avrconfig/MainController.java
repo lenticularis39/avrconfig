@@ -16,6 +16,8 @@ import javafx.scene.text.Text;
 import javafx.stage.*;
 
 public class MainController {
+    public String configurationFile = System.getProperty("user.home") + "/.config/avrconfig/config.xml";
+
     @FXML
     public Parent root;
 
@@ -121,7 +123,7 @@ public class MainController {
                     ErrorHandler.alertBug(e);
                 }
                 root.getScene().getWindow().setOnHiding(event -> {
-                    ConfigurationFile save = new ConfigurationFile("config.xml", _this);
+                    ConfigurationFile save = new ConfigurationFile(configurationFile, _this);
                     try {
                         save.save();
                     } catch(IOException e) {
@@ -138,12 +140,27 @@ public class MainController {
         t.setDaemon(true);
         t.start();
 
-        // Load configuration file
         try {
-            ConfigurationFile loader = new ConfigurationFile("config.xml", this);
+            ConfigurationFile loader = new ConfigurationFile(configurationFile, this);
             loader.load();
         } catch (FileNotFoundException e) {
             // The file does not exist, a new file will be created
+            if(configurationFile == System.getProperty("user.home") + "/.config/avrconfig/config.xml") {
+                // If the configuration file should be in the default location, check if it exists, if not, create it
+                if (!new File(System.getProperty("user.home") + "/.config").exists()) {
+                    // Config directory does not exist, create it and avrconfig subfolder
+                    System.out.println("Creating directory " + System.getProperty("user.home") + "/.config");
+                    new File(System.getProperty("user.home") + "/.config").mkdir();
+
+                    System.out.println("Creating directory " + System.getProperty("user.home") + "/.config/avrdude");
+                    new File(System.getProperty("user.home") + "/.config/avrconfig").mkdir();
+                } else if (!new File(System.getProperty("user.home") + "/.config/avrdude").exists()) {
+                    // Config directory exists, but avrconfig subdirectory does not exist
+                    System.out.println("Creating directory " + System.getProperty("user.home") + "/.config/avrdude");
+                    new File(System.getProperty("user.home") + "/.config/avrconfig").mkdir();
+                }
+            }
+            System.out.println("Creating file " + configurationFile);
         }
         catch(IOException ie) {
             ErrorHandler.alert("Cannot load configuration file.", "config.xml exists, but cannot be read. " +
@@ -234,7 +251,7 @@ public class MainController {
             chips = cp.parse("part");
             programmers = cp.parse("programmer");
         } catch(IOException e) {
-            ErrorHandler.alert("Cannot read avrdude configuration file.", "The filesystem is no longer available or corrupted.");
+            ErrorHandler.alert("Cannot read avrdude configuration file.", "The filesystem is no longer available or corrupted (or the folder does not exist).");
         }
 
         updateLists();
