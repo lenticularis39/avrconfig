@@ -268,7 +268,7 @@ public class MainController {
         tf.add(lowFuseTextField);
         tf.add(highFuseTextField);
         tf.add(extendedFuseTextField);
-        AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText(), text);
+        AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText(), text, tf);
         if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(Integer.parseInt(baudrateTextField.getText()));
         return avrDude;
     }
@@ -281,7 +281,7 @@ public class MainController {
         cb.add(BLB01);
         cb.add(LB2);
         cb.add(LB1);
-        AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText(), text);
+        AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText(), text, cb);
         if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(Integer.parseInt(baudrateTextField.getText()));
         return avrDude;
     }

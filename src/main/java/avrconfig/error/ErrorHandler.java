@@ -17,6 +17,15 @@ public interface ErrorHandler {
         a.showAndWait();
     }
 
+    static void info(String header, String text) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setTitle("AVRConfig");
+        a.setHeaderText(header);
+        a.setContentText(text);
+        a.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label)node).setMinHeight(Region.USE_PREF_SIZE));
+        a.showAndWait();
+    }
+
     static void alertBug(Exception e) {
         StringWriter errors = new StringWriter();
         e.printStackTrace(new PrintWriter(errors));
