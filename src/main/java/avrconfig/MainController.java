@@ -145,18 +145,18 @@ public class MainController {
             loader.load();
         } catch (FileNotFoundException e) {
             // The file does not exist, a new file will be created
-            if(configurationFile == System.getProperty("user.home") + "/.config/avrconfig/config.xml") {
+            if(configurationFile.equals(System.getProperty("user.home") + "/.config/avrconfig/config.xml")) {
                 // If the configuration file should be in the default location, check if it exists, if not, create it
-                if (!new File(System.getProperty("user.home") + "/.config").exists()) {
+                if (!new File(System.getProperty("user.home") + "/.config").isDirectory()) {
                     // Config directory does not exist, create it and avrconfig subfolder
                     System.out.println("Creating directory " + System.getProperty("user.home") + "/.config");
                     new File(System.getProperty("user.home") + "/.config").mkdir();
 
-                    System.out.println("Creating directory " + System.getProperty("user.home") + "/.config/avrdude");
+                    System.out.println("Creating directory " + System.getProperty("user.home") + "/.config/avrconfig");
                     new File(System.getProperty("user.home") + "/.config/avrconfig").mkdir();
-                } else if (!new File(System.getProperty("user.home") + "/.config/avrdude").exists()) {
+                } else if (!new File(System.getProperty("user.home") + "/.config/avrconfig").isDirectory()) {
                     // Config directory exists, but avrconfig subdirectory does not exist
-                    System.out.println("Creating directory " + System.getProperty("user.home") + "/.config/avrdude");
+                    System.out.println("Creating directory " + System.getProperty("user.home") + "/.config/avrconfig");
                     new File(System.getProperty("user.home") + "/.config/avrconfig").mkdir();
                 }
             }
