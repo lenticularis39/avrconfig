@@ -1,15 +1,19 @@
 # AVRConfig
-
-<p>(This is a draft, this repository will be updated with an English README and building instructions)</p>
-
-AVRConfig je jednoduché multiplatformní grafické rozhraní k programu avrdude napsané v JavěFX a vyvinuté za účelem zpříjemnění práce s AVR mikrokontroléry pro ty, kteří nemají rádi příkazovou řádku. Aplikace se také hodí například uživatelům, kteří přecházejí z Arduina (nebo podobných "jednoduchých" programovacích jazyků a hardwarů) na čisté C s klasickými programátory. Aplikace používá program avrdude, který vytvořil Brian S. Dean.
-<br><p><b>Poznámka: doporučujeme si před používáním programu stáhnout a přečíst dokumentaci, aby jste věděli o plných možnostech a nebo případných omezeních programu.</b></p>
-<h2>Funkce:</h2>
-<ul id="pouziti">
-<li>Nahrávat do/číst z flash paměti a EEPROM.</li>
-<li>Zapisovat/číst klasické fuse bity, fuseN bity a sigle fuse bity.</li>
-<li>Zapisovat/číst lock bity.</li>
-<li>Zkontrolovat připojení k mikroprocesoru.</li>
-<li>Kompletně promazat celý mikroporcesor.</li>
-</ul>
+<div id="text">
+<p>AVRConfig is simple multiplatform graphical interface for the program avrdude written in JavaFX. It was developed to make working with AVR microcontrollers easier (primarily for people who don't like console). It was also developed for those who did their projects with Arduino or with other simple SW and HW and want to try programming in pure C with only classical HW. The application uses the program avrdude by Brian S. Dean.</p>
 <br>
+<b>Note: we recommend you to download and read the documentation to introduce yourself all possibilities and/or limitations of the program.</b>
+<br>
+<h1>Features</h1>
+<ul id="pouziti">
+<li>-Upload to/read from flash memory or EEPROM.</li>
+<li>-Write/read classic fuse bits.</li>
+<li>-Write/read lock bits.</li>
+<li>-Check the microcontroller connection.</li>
+<li>-Erase the whole microcontroller.</li>
+</ul>
+<h1>Building avrconfig</h1>
+<p>You need a JDK, JavaFX (i.e. either the Oracle JDK, or OpenJDK with OpenJDX) and Maven. Then you can simply run</p>
+	mvn package
+<p>to build avrconfig.</p>
+
