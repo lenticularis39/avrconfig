@@ -31,6 +31,8 @@ public class MainController {
     @FXML
     public TextField baudrateTextField;
     @FXML
+    public TextField bitclockTextField;
+    @FXML
     public ChoiceBox microcontrollerChoiceBox;
     @FXML
     public ChoiceBox programmersChoiceBox;
@@ -259,7 +261,7 @@ public class MainController {
 
     public AVRDude getAvrDude(Text text) {
         AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText(), text);
-        if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(Integer.parseInt(baudrateTextField.getText()));
+        if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(baudrateTextField.getText());
         return avrDude;
     }
 
@@ -269,7 +271,8 @@ public class MainController {
         tf.add(highFuseTextField);
         tf.add(extendedFuseTextField);
         AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText(), text, tf);
-        if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(Integer.parseInt(baudrateTextField.getText()));
+        if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(baudrateTextField.getText());
+        if(!bitclockTextField.getText().equals("")) avrDude.setBitclock(bitclockTextField.getText());
         return avrDude;
     }
 
@@ -282,7 +285,8 @@ public class MainController {
         cb.add(LB2);
         cb.add(LB1);
         AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText(), text, cb);
-        if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(Integer.parseInt(baudrateTextField.getText()));
+        if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(baudrateTextField.getText());
+        if(!bitclockTextField.getText().equals("")) avrDude.setBitclock(bitclockTextField.getText());
         return avrDude;
     }
 

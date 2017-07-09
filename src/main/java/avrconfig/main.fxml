@@ -129,6 +129,23 @@
                         <Insets left="20.0" right="20.0" />
                      </padding>
                   </HBox>
+                  <HBox alignment="CENTER" layoutX="10.0" layoutY="144.0">
+                      <children>
+                          <Label prefHeight="21.0" prefWidth="143.0" text="Bitclock (or blank):">
+                              <HBox.margin>
+                                  <Insets right="10.0" />
+                              </HBox.margin>
+                          </Label>
+                          <TextField fx:id="bitclockTextField" HBox.hgrow="ALWAYS">
+                              <HBox.margin>
+                                  <Insets right="10.0" />
+                              </HBox.margin>
+                          </TextField>
+                      </children>
+                      <padding>
+                          <Insets left="20.0" right="20.0" />
+                      </padding>
+                  </HBox>
                   <HBox prefHeight="25.0" prefWidth="600.0">
                       <VBox.margin>
                           <Insets top="10.0" />

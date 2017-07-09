@@ -23,7 +23,8 @@ public class AVRDude {
     String chip;
     String programmer;
     String port;
-    int baudrate = 0;
+    String baudrate = "";
+    String bitclock = "";
     Text output;
     ArrayList<TextField> tf;
     Vector<CheckBox> cb;
@@ -65,9 +66,11 @@ public class AVRDude {
         avrdudeMode = CatchingMode.LOCK;
     }
 
-    public void setBaudrate(int baudrate) {
+    public void setBaudrate(String baudrate) {
         this.baudrate = baudrate;
     }
+
+    public void setBitclock(String bitclock) { this.bitclock = bitclock; }
 
     public void run(ArrayList<String> parameters) {
         run(parameters, new File(avrdudePath).getParentFile());
@@ -88,9 +91,13 @@ public class AVRDude {
             parameters.add("-P");
             parameters.add(port);
         }
-        if(baudrate != 0) {
+        if(!baudrate.equals("")) {
             parameters.add("-b");
             parameters.add(new Integer(baudrate).toString());
+        }
+        if(!bitclock.equals("")) {
+            parameters.add("-B");
+            parameters.add(new Float(bitclock).toString());
         }
 
         call.addAll(parameters);

@@ -20,7 +20,7 @@ public class Main extends Application {
     String configurationFile;
     @Override
     public void start(Stage primaryStage) throws Exception{
-        fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("main.fxml"));
+        fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("avrconfig/main.fxml"));
 
         // Configuration file needs to be set up to load before the FXML is loaded
         configurationFile = System.getProperty("user.home") + "/.config/avrconfig/config.xml";
