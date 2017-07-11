@@ -5,6 +5,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
@@ -14,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<TabPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="511.0" prefWidth="764.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="avrconfig.MainController">
+<TabPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="511.0" prefWidth="764.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="avrconfig.MainController">
   <tabs>
     <Tab text="Setup">
       <content>
@@ -22,7 +23,7 @@
               <children>
                   <HBox alignment="CENTER">
                      <children>
-                        <Label prefHeight="21.0" text="Path to avrdude:">
+                        <Label prefHeight="21.0" prefWidth="170.0" text="Path to avrdude:">
                            <HBox.margin>
                               <Insets right="10.0" />
                            </HBox.margin>
@@ -46,7 +47,7 @@
                           <Insets />
                       </VBox.margin>
                       <children>
-                          <Label text="Path to avrdude.conf:">
+                          <Label prefWidth="170.0" text="Path to avrdude.conf:">
                               <HBox.margin>
                                   <Insets right="10.0" />
                               </HBox.margin>
@@ -70,7 +71,7 @@
                           <Insets left="20.0" right="20.0" />
                       </padding>
                       <children>
-                          <Label text="Select microcontroller:">
+                          <Label prefWidth="170.0" text="Select microcontroller:">
                               <HBox.margin>
                                   <Insets right="10.0" />
                               </HBox.margin>
@@ -85,7 +86,7 @@
                           <Insets left="20.0" right="20.0" />
                       </padding>
                       <children>
-                          <Label prefHeight="21.0" prefWidth="148.0" text="Select programmer:">
+                          <Label prefHeight="21.0" prefWidth="170.0" text="Select programmer:">
                               <HBox.margin>
                                   <Insets right="10.0" />
                               </HBox.margin>
@@ -97,14 +98,14 @@
                           <Insets />
                       </VBox.margin>
                       <children>
-                          <Label prefHeight="21.0" prefWidth="143.0" text="Port (or blank):">
+                          <Label prefHeight="21.0" prefWidth="170.0" text="Port (or blank):">
                               <HBox.margin>
                                   <Insets right="10.0" />
                               </HBox.margin>
                           </Label>
                           <TextField fx:id="portTextField" HBox.hgrow="ALWAYS">
                               <HBox.margin>
-                                  <Insets right="10.0" />
+                                  <Insets />
                               </HBox.margin>
                           </TextField>
                       </children>
@@ -114,14 +115,14 @@
                   </HBox>
                   <HBox alignment="CENTER" layoutX="10.0" layoutY="144.0">
                      <children>
-                        <Label prefHeight="21.0" prefWidth="143.0" text="Baudrate (or blank):">
+                        <Label prefHeight="21.0" prefWidth="170.0" text="Baudrate (or blank):">
                            <HBox.margin>
                               <Insets right="10.0" />
                            </HBox.margin>
                         </Label>
                         <TextField fx:id="baudrateTextField" HBox.hgrow="ALWAYS">
                            <HBox.margin>
-                              <Insets right="10.0" />
+                              <Insets />
                            </HBox.margin>
                         </TextField>
                      </children>
@@ -131,20 +132,33 @@
                   </HBox>
                   <HBox alignment="CENTER" layoutX="10.0" layoutY="144.0">
                       <children>
-                          <Label prefHeight="21.0" prefWidth="143.0" text="Bitclock (or blank):">
+                          <Label prefHeight="21.0" prefWidth="170.0" text="Bitclock (or blank):">
                               <HBox.margin>
                                   <Insets right="10.0" />
                               </HBox.margin>
                           </Label>
                           <TextField fx:id="bitclockTextField" HBox.hgrow="ALWAYS">
                               <HBox.margin>
-                                  <Insets right="10.0" />
+                                  <Insets />
                               </HBox.margin>
                           </TextField>
                       </children>
                       <padding>
                           <Insets left="20.0" right="20.0" />
                       </padding>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="26.0" prefWidth="764.0">
+                     <children>
+                        <Label prefHeight="21.0" prefWidth="170.0" text="Verbose output mode:">
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <ListView fx:id="verboseListView" orientation="HORIZONTAL" prefWidth="394.0" HBox.hgrow="ALWAYS" />
+                     </children>
+                     <padding>
+                        <Insets left="20.0" right="20.0" />
+                     </padding>
                   </HBox>
                   <HBox prefHeight="25.0" prefWidth="600.0">
                       <VBox.margin>

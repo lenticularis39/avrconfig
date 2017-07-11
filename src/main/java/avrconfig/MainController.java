@@ -36,6 +36,8 @@ public class MainController {
     public ChoiceBox microcontrollerChoiceBox;
     @FXML
     public ChoiceBox programmersChoiceBox;
+    @FXML
+    public ListView<Integer> verboseListView;
 
     // Flash page
     @FXML
@@ -117,7 +119,6 @@ public class MainController {
         MainController _this = this;
 
         Task setSave = new Task<Void>() {
-            @Override
             protected Void call() {
                 try {
                     Thread.sleep(1000);
@@ -183,6 +184,10 @@ public class MainController {
         readFormatChoiceBox.setValue("Intel HEX");
         readFormatChoiceBoxEEPROM.setItems(readFormats);
         readFormatChoiceBoxEEPROM.setValue("Intel HEX");
+
+        // Set verbose modes
+        ObservableList<Integer> verboseModes = FXCollections.observableArrayList(0, 1, 2, 3, 4);
+        verboseListView.setItems(verboseModes);
     }
 
 
@@ -257,6 +262,12 @@ public class MainController {
         }
 
         updateLists();
+    }
+
+    public void verboseOutput(ArrayList<String> parameters) {
+        for (char a=0; a < verboseListView.getSelectionModel().getSelectedItem(); a++) {
+            parameters.add("-v");
+        }
     }
 
     public AVRDude getAvrDude(Text text) {
@@ -342,6 +353,7 @@ public class MainController {
 
         parameters.add("-U");
         parameters.add("flash:r:" + hexFile.getName() + ":" + readType);
+        verboseOutput(parameters);
 
         avrDude.run(parameters, hexFile.getParentFile());
     }
@@ -412,6 +424,7 @@ public class MainController {
         }
         parameters.add("-U");
         parameters.add("eeprom:w:" + hexFile.getName());
+        verboseOutput(parameters);
 
         avrDude.run(parameters, hexFile.getParentFile());
     }
@@ -430,6 +443,7 @@ public class MainController {
 
         parameters.add("-U");
         parameters.add("flash:w:" + hexFile.getName());
+        verboseOutput(parameters);
 
         avrDude.run(parameters, hexFile.getParentFile());
     }
@@ -456,6 +470,7 @@ public class MainController {
             parameters.add("-U");
             parameters.add("efuse:w:" + extendedFuseTextField.getText() + ":m");
         }
+        verboseOutput(parameters);
 
         avrDude.run(parameters);
     }
@@ -476,6 +491,7 @@ public class MainController {
 
         parameters.add("-U");
         parameters.add("efuse:r:-:h");
+        verboseOutput(parameters);
 
         avrDude.run(parameters);
     }
@@ -489,6 +505,7 @@ public class MainController {
 
         parameters.add("-U");
         parameters.add("lock:r:-:d");
+        verboseOutput(parameters);
 
         avrDude.run(parameters);
     }
@@ -515,6 +532,7 @@ public class MainController {
 
         parameters.add("-U");
         parameters.add("lock:w:" + locks.toString() + ":m");
+        verboseOutput(parameters);
 
         avrDude.run(parameters);
     }
@@ -525,6 +543,8 @@ public class MainController {
         if(overrideSignatureCheckOther.isSelected()) {
             parameters.add("-F");
         }
+        verboseOutput(parameters);
+
         avrDude.run(parameters);
     }
 
@@ -536,6 +556,7 @@ public class MainController {
         if (overrideSignatureCheckOther.isSelected()) {
             parameters.add("-F");
         }
+        verboseOutput(parameters);
 
         avrDude.run(parameters);
     }
