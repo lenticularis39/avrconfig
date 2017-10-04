@@ -1,19 +1,24 @@
 package avrconfig;
 
 import java.io.*;
+import java.text.NumberFormat;
 import java.util.*;
 
 import avrconfig.data.ConfigParser;
 import avrconfig.data.ConfigurationFile;
 import avrconfig.error.ErrorHandler;
+import avrconfig.serial.Serial;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.*;
+
+import javax.xml.bind.annotation.XmlAnyAttribute;
 
 public class MainController {
     public String configurationFile = System.getProperty("user.home") + "/.config/avrconfig/config.xml";
@@ -101,9 +106,27 @@ public class MainController {
     @FXML
     public CheckBox overrideSignatureCheckOther;
 
+    // Serial page
+    @FXML
+    public Text serialOutput;
+    @FXML
+    public TextField serialPort;
+    @FXML
+    public TextField serialBaudrate;
+    @FXML
+    public Button turnSerialOn;
+
+    @FXML
+    public CheckBox serialClearBeforeEnabling;
+    @FXML
+    public CheckBox serialUseMonospaceFont;
+    @FXML
+    public CheckBox serialAutoScroll;
+
     FileChooser fileChooser;
     public Hashtable<String, String> chips;
     public Hashtable<String, String> programmers;
+    Serial serial;
 
     public MainController() {
         super();
@@ -188,6 +211,7 @@ public class MainController {
         // Set verbose modes
         ObservableList<Integer> verboseModes = FXCollections.observableArrayList(0, 1, 2, 3, 4);
         verboseListView.setItems(verboseModes);
+        verboseListView.getSelectionModel().select(new Integer(0));
     }
 
 
@@ -559,5 +583,36 @@ public class MainController {
         verboseOutput(parameters);
 
         avrDude.run(parameters);
+    }
+
+    public void startOrStopSerial() {
+        if(serial == null) {
+            // Turn on serial
+
+            try {
+                serial = new Serial(serialPort.getText(), Integer.parseInt(serialBaudrate.getText()), serialOutput);
+                serial.start();
+                turnSerialOn.setText("Disable serial");
+            } catch (IOException ie) {
+                ErrorHandler.alert("IO error", "Can't open serial.");
+            } catch (NumberFormatException nfe) {
+                ErrorHandler.alert("Invalid baudrate value", "Please enter a positive whole number.");
+            }
+        } else {
+            // Turn off serial
+
+            serial.stop();
+            try {
+                serial.closeStream();
+            } catch(IOException ie) {
+                ErrorHandler.alert("IO error", "Failed to close stream.");
+            }
+            serial = null;
+            turnSerialOn.setText("Enable serial");
+        }
+    }
+
+    public void clearSerialOutput() {
+        serialOutput.setText("");
     }
 }

@@ -105,14 +105,14 @@ public class AVRDude {
         try {
             Process avrdude = r.exec(Arrays.copyOf(call.toArray(), call.toArray().length, String[].class), null, envDir);
 
-            BufferedReader err = new BufferedReader(new InputStreamReader(avrdude.getErrorStream()));
+            InputStreamReader err = new InputStreamReader(avrdude.getErrorStream());
             output.setText("");
             Task updateTextArea = new Task<Void>() {
                 @Override protected Void call() throws Exception {
                     while (avrdude.isAlive()) {
-                        String line;
-                        while ((line = err.readLine()) != null) {
-                            Platform.runLater(new Vypis(line));
+                        int ch;
+                        while ((ch = err.read()) != -1) {
+                            Platform.runLater(new Vypis(Character.toString((char)ch), false));
                         }
                     }
                     return null;
@@ -167,14 +167,18 @@ public class AVRDude {
 
     private class Vypis implements Runnable {
         String line;
+        boolean eol;
 
-        public Vypis(String line) {
-            this.line = line;
+        public Vypis(String line, boolean eol) {
+            this.line = line; this.eol = eol;
         }
 
         @Override
         public void run() {
-            output.setText(output.getText() + "\n" + line);
+            if(eol)
+                output.setText(output.getText() + "\n" + line);
+            else
+                output.setText(output.getText()  + line);
         }
     }
 
@@ -182,7 +186,7 @@ public class AVRDude {
         ArrayList<TextField> tf;
 
         public ChytacFusu(String line, ArrayList<TextField> tf) {
-            super(line);
+            super(line, true);
             this.tf = tf;
         }
 
@@ -200,7 +204,7 @@ public class AVRDude {
         Vector<CheckBox> cb;
 
         public ChytacLocku(String line, Vector<CheckBox> cb) {
-            super(line);
+            super(line, true);
             this.cb = cb;
         }
 
