@@ -1,9 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="AVRConfig">
-    <output-path>$PROJECT_DIR$/classes/artifacts/AVRConfig</output-path>
-    <root id="archive" name="AVRConfig.jar">
-      <element id="module-output" name="avrconfig" />
-      <element id="dir-copy" path="$PROJECT_DIR$/target/classes" />
-    </root>
-  </artifact>
-</component>

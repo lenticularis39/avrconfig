@@ -1,69 +1,51 @@
 package avrconfig;
 
 import avrconfig.error.ErrorHandler;
-import javafx.application.Platform;
+import avrconfig.util.FuseBitsUpdateListener;
+import avrconfig.util.TextUpdateListener;
+
 import javafx.concurrent.Task;
-import javafx.scene.control.Alert;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextField;
-import javafx.scene.text.Text;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Vector;
+import java.util.*;
 
 public class AVRDude {
-    enum CatchingMode {
-        NORMAL, FUSES1, FUSES2, LOCK
-    }
-    public CatchingMode avrdudeMode;
-    String avrdudePath;
-    String configPath;
-    String chip;
-    String programmer;
-    String port;
-    String baudrate = "";
-    String bitclock = "";
-    Text output;
-    ArrayList<TextField> tf;
-    Vector<CheckBox> cb;
+    private String avrdudePath;
+    private String configPath;
+    private String chip;
+    private String programmer;
+    private String port;
+    private String baudrate = "";
+    private String bitclock = "";
 
-    static int count; // Counter for reading fuse bits
+    private Vector<TextUpdateListener> ouls = new Vector<>(3);
+    private Vector<FuseBitsUpdateListener> fbuls = new Vector<>(3);
+    private Vector<TextUpdateListener> lbuls = new Vector<>(3);
 
-    public AVRDude(String path, String configPath, String chip, String programmer, String port, Text ta) {
+    private static int fuseBitCounter = 0; // Counter for reading fuse bits
+
+
+    public AVRDude(String path, String configPath, String chip, String programmer, String port) {
         this.avrdudePath = path;
         this.configPath = configPath;
         this.chip = chip;
         this.programmer = programmer;
         this.port = port;
-        output = ta;
-
-        avrdudeMode = CatchingMode.NORMAL;
     }
 
-    public AVRDude(String path, String configPath, String chip, String programmer, String port, Text ta, ArrayList<TextField> tf) {
-        this.avrdudePath = path;
-        this.configPath = configPath;
-        this.chip = chip;
-        this.programmer = programmer;
-        this.port = port;
-        this.tf = tf;
-        output = ta;
 
-        avrdudeMode = CatchingMode.FUSES1;
+    public void addOutputUpdateEventListener(TextUpdateListener oul) {
+        ouls.add(oul);
     }
 
-    public AVRDude(String path, String configPath, String chip, String programmer, String port, Text ta, Vector<CheckBox> cb) {
-        this.avrdudePath = path;
-        this.configPath = configPath;
-        this.chip = chip;
-        this.programmer = programmer;
-        this.port = port;
-        this.cb = cb;
-        output = ta;
+    public void addFuseBitsUpdateEventListener(FuseBitsUpdateListener fbul)
+    {
+        fbuls.add(fbul);
+    }
 
-        avrdudeMode = CatchingMode.LOCK;
+    public void addLocksBitsUpdateEventListener(TextUpdateListener lbul)
+    {
+        lbuls.add(lbul);
     }
 
     public void setBaudrate(String baudrate) {
@@ -106,13 +88,14 @@ public class AVRDude {
             Process avrdude = r.exec(Arrays.copyOf(call.toArray(), call.toArray().length, String[].class), null, envDir);
 
             InputStreamReader err = new InputStreamReader(avrdude.getErrorStream());
-            output.setText("");
+
             Task updateTextArea = new Task<Void>() {
                 @Override protected Void call() throws Exception {
                     while (avrdude.isAlive()) {
                         int ch;
                         while ((ch = err.read()) != -1) {
-                            Platform.runLater(new Vypis(Character.toString((char)ch), false));
+                            for(TextUpdateListener oul : ouls)
+                                oul.updateText(Character.toString((char)ch));
                         }
                     }
                     return null;
@@ -122,99 +105,61 @@ public class AVRDude {
             updateTextAreaThread.setDaemon(true);
             updateTextAreaThread.start();
 
-            if(avrdudeMode == CatchingMode.FUSES1) {
+            if(fbuls.size() != 0) {
                 BufferedReader out = new BufferedReader(new InputStreamReader(avrdude.getInputStream()));
-                count = 0;
-                Task updateTextArea2 = new Task<Void>() {
+                fuseBitCounter = 0;
+                Task catchFuses1Task = new Task<Void>() {
                     @Override
                     protected Void call() throws Exception {
                         while (avrdude.isAlive()) {
                             String line;
                             while ((line = out.readLine()) != null) {
-                                Platform.runLater(new ChytacFusu(line, tf));
+                                for(FuseBitsUpdateListener fbul : fbuls)
+                                    switch(fuseBitCounter)
+                                    {
+                                        case(0):
+                                            fbul.updateLowFuseBits(line);
+                                            break;
+                                        case(1):
+                                            fbul.updateHighFuseBits(line);
+                                            break;
+                                        case(2):
+                                            fbul.updateExtendedFuseBits(line);
+                                            break;
+                                    }
+
+                                fuseBitCounter++;
                             }
                         }
                         return null;
                     }
                 };
-                Thread updateTextAreaThread2 = new Thread(updateTextArea2);
-                updateTextAreaThread2.setDaemon(true);
-                updateTextAreaThread2.start();
+                Thread catchFuses1Thread = new Thread(catchFuses1Task);
+                catchFuses1Thread.setDaemon(true);
+                catchFuses1Thread.start();
             }
 
-            if(avrdudeMode == CatchingMode.LOCK) {
+            if(lbuls.size() != 0) {
                 BufferedReader out = new BufferedReader(new InputStreamReader(avrdude.getInputStream()));
-                Task updateTextArea2 = new Task<Void>() {
+                Task catchLockTask = new Task<Void>() {
                     @Override
                     protected Void call() throws Exception {
                         while (avrdude.isAlive()) {
                             String line;
                             while ((line = out.readLine()) != null) {
-                                Platform.runLater(new ChytacLocku(line, cb));
+                                for(TextUpdateListener lbul : lbuls)
+                                    lbul.updateText(line);
                             }
                         }
                         return null;
                     }
                 };
-                Thread updateTextAreaThread2 = new Thread(updateTextArea2);
-                updateTextAreaThread2.setDaemon(true);
-                updateTextAreaThread2.start();
+                Thread catchLockThread = new Thread(catchLockTask);
+                catchLockThread.setDaemon(true);
+                catchLockThread.start();
             }
         } catch(IOException e) {
             ErrorHandler.alert("Cannot execute avrdude.", "Please check the path to the avrdude binary.");
-        }
-    }
-
-    private class Vypis implements Runnable {
-        String line;
-        boolean eol;
-
-        public Vypis(String line, boolean eol) {
-            this.line = line; this.eol = eol;
-        }
-
-        @Override
-        public void run() {
-            if(eol)
-                output.setText(output.getText() + "\n" + line);
-            else
-                output.setText(output.getText()  + line);
-        }
-    }
-
-    private class ChytacFusu extends Vypis {
-        ArrayList<TextField> tf;
-
-        public ChytacFusu(String line, ArrayList<TextField> tf) {
-            super(line, true);
-            this.tf = tf;
-        }
-
-        @Override
-        public void run() {
-            if(count < 3) {
-                tf.get(count).setText(line);
-                count++;
-            }
-            super.run();
-        }
-    }
-
-    private class ChytacLocku extends Vypis {
-        Vector<CheckBox> cb;
-
-        public ChytacLocku(String line, Vector<CheckBox> cb) {
-            super(line, true);
-            this.cb = cb;
-        }
-
-        @Override
-        public void run() {
-            byte locks = Byte.parseByte(line);
-            for(int i = 0; i <= 5; i++) {
-                cb.get(i).setSelected(!((locks & (0b00100000 >> i)) > 0));
-            }
-            super.run();
         }
     }
 }

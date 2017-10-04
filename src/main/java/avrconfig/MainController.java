@@ -1,24 +1,22 @@
 package avrconfig;
 
 import java.io.*;
-import java.text.NumberFormat;
 import java.util.*;
 
 import avrconfig.data.ConfigParser;
 import avrconfig.data.ConfigurationFile;
 import avrconfig.error.ErrorHandler;
 import avrconfig.serial.Serial;
+import avrconfig.util.FuseBitsUpdateListener;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.*;
-
-import javax.xml.bind.annotation.XmlAnyAttribute;
 
 public class MainController {
     public String configurationFile = System.getProperty("user.home") + "/.config/avrconfig/config.xml";
@@ -288,45 +286,66 @@ public class MainController {
         updateLists();
     }
 
-    public void verboseOutput(ArrayList<String> parameters) {
+    public void addVerboseOutput(ArrayList<String> parameters) {
         for (char a=0; a < verboseListView.getSelectionModel().getSelectedItem(); a++) {
             parameters.add("-v");
         }
     }
 
-    public AVRDude getAvrDude(Text text) {
-        AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText(), text);
+    private AVRDude getAvrDude(Text text) {
+        AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText());
+        avrDude.addOutputUpdateEventListener((newText) -> Platform.runLater(() -> text.setText(text.getText()  + newText)));
         if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(baudrateTextField.getText());
         return avrDude;
     }
 
-    public AVRDude getAvrDudeFUSES1(Text text) {
-        ArrayList<TextField> tf = new ArrayList<>();
-        tf.add(lowFuseTextField);
-        tf.add(highFuseTextField);
-        tf.add(extendedFuseTextField);
-        AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText(), text, tf);
-        if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(baudrateTextField.getText());
+    private AVRDude getAvrDudeFUSES1(Text text) {
+        AVRDude avrDude = getAvrDude(text);
+
+        avrDude.addFuseBitsUpdateEventListener(new FuseBitsUpdateListener() {
+            @Override
+            public void updateLowFuseBits(String fs) {
+                Platform.runLater(() -> lowFuseTextField.setText(fs));
+            }
+
+            @Override
+            public void updateHighFuseBits(String fs) {
+                Platform.runLater(() -> highFuseTextField.setText(fs));
+            }
+
+            @Override
+            public void updateExtendedFuseBits(String fs) {
+                Platform.runLater(() -> extendedFuseTextField.setText(fs));
+            }
+        });
+
         if(!bitclockTextField.getText().equals("")) avrDude.setBitclock(bitclockTextField.getText());
         return avrDude;
     }
 
-    public AVRDude getAvrDudeLOCK(Text text) {
-        Vector<CheckBox> cb = new Vector<>();
-        cb.add(BLB12);
-        cb.add(BLB11);
-        cb.add(BLB02);
-        cb.add(BLB01);
-        cb.add(LB2);
-        cb.add(LB1);
-        AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText(), text, cb);
-        if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(baudrateTextField.getText());
+    private AVRDude getAvrDudeLOCK(Text text) {
+        AVRDude avrDude = getAvrDude(text);
+
+        avrDude.addLocksBitsUpdateEventListener((newLockBits) -> {
+            byte newLockBitsByte = Byte.parseByte(newLockBits);
+
+            Platform.runLater(() -> {
+                BLB12.setSelected(!((newLockBitsByte & (0b00100000 >> 0)) > 0));
+                BLB11.setSelected(!((newLockBitsByte & (0b00100000 >> 1)) > 0));
+                BLB02.setSelected(!((newLockBitsByte & (0b00100000 >> 2)) > 0));
+                BLB01.setSelected(!((newLockBitsByte & (0b00100000 >> 3)) > 0));
+                LB1.setSelected(!((newLockBitsByte & (0b00100000 >> 4)) > 0));
+                LB2.setSelected(!((newLockBitsByte & (0b00100000 >> 5)) > 0));
+            });
+        });
+
         if(!bitclockTextField.getText().equals("")) avrDude.setBitclock(bitclockTextField.getText());
         return avrDude;
     }
 
     public void readFlash() {
         AVRDude avrDude = getAvrDude(flashOutput);
+        flashOutput.setText("");
         File hexFile = new File(readFlashTextField.getText());
 
         ArrayList<String> parameters = new ArrayList<>();
@@ -377,13 +396,14 @@ public class MainController {
 
         parameters.add("-U");
         parameters.add("flash:r:" + hexFile.getName() + ":" + readType);
-        verboseOutput(parameters);
+        addVerboseOutput(parameters);
 
         avrDude.run(parameters, hexFile.getParentFile());
     }
 
     public void readEEPROM() {
         AVRDude avrDude = getAvrDude(EEPROMOutput);
+        EEPROMOutput.setText("");
         File hexFile = new File(readEEPROMTextField.getText());
 
         ArrayList<String> parameters = new ArrayList<>();
@@ -440,6 +460,8 @@ public class MainController {
 
     public void writeEEPROM() {
         AVRDude avrDude = getAvrDude(EEPROMOutput);
+        EEPROMOutput.setText("");
+
         ArrayList<String> parameters = new ArrayList<>();
         File hexFile = new File(writeEEPROMTextField.getText());
 
@@ -448,13 +470,15 @@ public class MainController {
         }
         parameters.add("-U");
         parameters.add("eeprom:w:" + hexFile.getName());
-        verboseOutput(parameters);
+        addVerboseOutput(parameters);
 
         avrDude.run(parameters, hexFile.getParentFile());
     }
 
     public void writeFlash(){
         AVRDude avrDude = getAvrDude(flashOutput);
+        flashOutput.setText("");
+
         ArrayList<String> parameters = new ArrayList<>();
         File hexFile = new File(writeFlashTextField.getText());
 
@@ -467,13 +491,15 @@ public class MainController {
 
         parameters.add("-U");
         parameters.add("flash:w:" + hexFile.getName());
-        verboseOutput(parameters);
+        addVerboseOutput(parameters);
 
         avrDude.run(parameters, hexFile.getParentFile());
     }
 
     public void writeFusesButtonClicked() {
         AVRDude avrDude = getAvrDude(classicFusesOutput);
+        classicFusesOutput.setText("");
+
         ArrayList<String> parameters = new ArrayList<>();
 
         if(overrideSignatureCheckBoxClassicF.isSelected()) {
@@ -494,13 +520,15 @@ public class MainController {
             parameters.add("-U");
             parameters.add("efuse:w:" + extendedFuseTextField.getText() + ":m");
         }
-        verboseOutput(parameters);
+        addVerboseOutput(parameters);
 
         avrDude.run(parameters);
     }
 
     public void readFusesButtonClicked() {
         AVRDude avrDude = getAvrDudeFUSES1(classicFusesOutput);
+        classicFusesOutput.setText("");
+
         ArrayList<String> parameters = new ArrayList<>();
 
         if(overrideSignatureCheckBoxClassicF.isSelected()) {
@@ -515,13 +543,15 @@ public class MainController {
 
         parameters.add("-U");
         parameters.add("efuse:r:-:h");
-        verboseOutput(parameters);
+        addVerboseOutput(parameters);
 
         avrDude.run(parameters);
     }
 
     public void readLockBitsButtonClicked() {
         AVRDude avrDude = getAvrDudeLOCK(lockBitsOutput);
+        lockBitsOutput.setText("");
+
         ArrayList<String> parameters = new ArrayList<>();
         if(overrideSignatureCheckLock.isSelected()) {
             parameters.add("-F");
@@ -529,13 +559,15 @@ public class MainController {
 
         parameters.add("-U");
         parameters.add("lock:r:-:d");
-        verboseOutput(parameters);
+        addVerboseOutput(parameters);
 
         avrDude.run(parameters);
     }
 
     public void writeLockBitsButtonClicked() {
         AVRDude avrDude = getAvrDude(lockBitsOutput);
+        lockBitsOutput.setText("");
+
         ArrayList<String> parameters = new ArrayList<>();
         if(overrideSignatureCheckLock.isSelected()) {
             parameters.add("-F");
@@ -556,31 +588,35 @@ public class MainController {
 
         parameters.add("-U");
         parameters.add("lock:w:" + locks.toString() + ":m");
-        verboseOutput(parameters);
+        addVerboseOutput(parameters);
 
         avrDude.run(parameters);
     }
 
     public void checkConnectionButtonClicked() {
-        AVRDude avrDude = getAvrDudeFUSES1(otherOutput);
+        AVRDude avrDude = getAvrDude(otherOutput);
+        otherOutput.setText("");
+
         ArrayList<String> parameters = new ArrayList<>();
         if(overrideSignatureCheckOther.isSelected()) {
             parameters.add("-F");
         }
-        verboseOutput(parameters);
+        addVerboseOutput(parameters);
 
         avrDude.run(parameters);
     }
 
     public void eraseButtonClicked() {
         AVRDude avrDude = getAvrDude(otherOutput);
+        otherOutput.setText("");
+
         ArrayList<String> parameters = new ArrayList<>();
 
         parameters.add("-e");
         if (overrideSignatureCheckOther.isSelected()) {
             parameters.add("-F");
         }
-        verboseOutput(parameters);
+        addVerboseOutput(parameters);
 
         avrDude.run(parameters);
     }
