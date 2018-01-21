@@ -41,6 +41,8 @@ public class MainController {
     public ChoiceBox programmersChoiceBox;
     @FXML
     public ListView<Integer> verboseListView;
+    @FXML
+    public ListView<AVRDude> avrdudeProcessList;
 
     // Flash page
     @FXML
@@ -126,6 +128,8 @@ public class MainController {
     public Hashtable<String, String> programmers;
     Serial serial;
 
+    ObservableList<AVRDude> avrdudeProcesses = FXCollections.observableArrayList();
+
     public MainController() {
         super();
 
@@ -144,7 +148,7 @@ public class MainController {
                 try {
                     Thread.sleep(1000);
                 } catch(InterruptedException e) {
-                    ErrorHandler.alertBug(e);
+                    Platform.runLater(() -> ErrorHandler.alertBug(e));
                 }
                 root.getScene().getWindow().setOnHiding(event -> {
                     ConfigurationFile save = new ConfigurationFile(configurationFile, _this);
@@ -294,7 +298,12 @@ public class MainController {
 
     private AVRDude getAvrDude(Text text) {
         AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText());
+        avrdudeProcesses.add(avrDude);
+        avrdudeProcessList.setItems(avrdudeProcesses);
         avrDude.addOutputUpdateEventListener((newText) -> Platform.runLater(() -> text.setText(text.getText()  + newText)));
+        avrDude.addProcessStopUpdateEventListener(() -> Platform.runLater(() -> {
+            avrdudeProcessList.refresh();
+        }));
         if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(baudrateTextField.getText());
         return avrDude;
     }
@@ -619,6 +628,28 @@ public class MainController {
         addVerboseOutput(parameters);
 
         avrDude.run(parameters);
+    }
+
+    public void sendTextToAvrdudeButtonClicked() {
+        TextInputDialog tid = new TextInputDialog();
+        tid.setTitle("Send text to avrdude");
+        tid.setHeaderText("Type the text to be sent to avrdude");
+
+        Optional<String> result = tid.showAndWait();
+        if(result.isPresent()) {
+            AVRDude avrDude = avrdudeProcessList.getSelectionModel().getSelectedItem();
+            try {
+                avrDude.sendCommand(result.get());
+            } catch(IOException ie) {
+                ErrorHandler.alertBug(ie);
+            }
+        }
+    }
+
+    public void killProcessButtonClicked() {
+        AVRDude avrDude = avrdudeProcessList.getSelectionModel().getSelectedItem();
+
+        avrDude.killProcess();
     }
 
     public void startOrStopSerial() {

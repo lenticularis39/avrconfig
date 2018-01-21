@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * Created by tglozar on 27.8.17.
  */
-public interface ISerialController {
+public interface SerialController {
     void start() throws IOException;
     void stop() throws IOException;
     void setBaudrate(int baudrate) throws IOException;

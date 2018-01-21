@@ -10,7 +10,7 @@ import java.io.*;
 /**
  * Created by tglozar on 20.8.17.
  */
-public class Serial implements ISerialController {
+public class Serial implements SerialController {
     int baudrate;
     String filename;
     FileInputStream serialInputStream;

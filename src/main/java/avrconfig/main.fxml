@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<TabPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="511.0" prefWidth="764.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="avrconfig.MainController">
+<TabPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="537.0" prefWidth="764.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="avrconfig.MainController">
   <tabs>
     <Tab text="Setup">
       <content>
@@ -147,14 +147,14 @@
                           <Insets left="20.0" right="20.0" />
                       </padding>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="26.0" prefWidth="764.0">
+                  <HBox alignment="CENTER" minHeight="26.0" prefHeight="21.0">
                      <children>
                         <Label prefHeight="21.0" prefWidth="170.0" text="Verbose output mode:">
                            <HBox.margin>
                               <Insets right="10.0" />
                            </HBox.margin>
                         </Label>
-                        <ListView fx:id="verboseListView" orientation="HORIZONTAL" prefWidth="394.0" HBox.hgrow="ALWAYS" />
+                        <ListView fx:id="verboseListView" orientation="HORIZONTAL" prefHeight="21.0" prefWidth="394.0" HBox.hgrow="ALWAYS" />
                      </children>
                      <padding>
                         <Insets left="20.0" right="20.0" />
@@ -173,6 +173,31 @@
                       </children>
                       <padding>
                           <Insets left="20.0" right="20.0" />
+                      </padding>
+                  </HBox>
+                  <ListView fx:id="avrdudeProcessList">
+                      <VBox.margin>
+                          <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+                      </VBox.margin>
+                  </ListView>
+                  <HBox prefHeight="25.0" prefWidth="600.0" spacing="10.0">
+                      <VBox.margin>
+                          <Insets top="10.0" />
+                      </VBox.margin>
+                      <children>
+                          <Button mnemonicParsing="false" onAction="#killProcessButtonClicked" text="Kill process">
+                              <HBox.margin>
+                                  <Insets />
+                              </HBox.margin>
+                          </Button>
+                          <Button mnemonicParsing="false" onAction="#sendTextToAvrdudeButtonClicked" text="Send text to process's stdin">
+                              <HBox.margin>
+                                  <Insets />
+                              </HBox.margin>
+                          </Button>
+                      </children>
+                      <padding>
+                          <Insets bottom="20.0" left="20.0" right="20.0" />
                       </padding>
                   </HBox>
               </children>

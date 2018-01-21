@@ -2,6 +2,7 @@ package avrconfig;
 
 import avrconfig.error.ErrorHandler;
 import avrconfig.util.FuseBitsUpdateListener;
+import avrconfig.util.GenericUpdateListener;
 import avrconfig.util.TextUpdateListener;
 
 import javafx.concurrent.Task;
@@ -21,8 +22,12 @@ public class AVRDude {
     private Vector<TextUpdateListener> ouls = new Vector<>(3);
     private Vector<FuseBitsUpdateListener> fbuls = new Vector<>(3);
     private Vector<TextUpdateListener> lbuls = new Vector<>(3);
+    private Vector<GenericUpdateListener> stops = new Vector<>(1);
 
     private static int fuseBitCounter = 0; // Counter for reading fuse bits
+
+    private String strRep = "";
+    private Process process;
 
 
     public AVRDude(String path, String configPath, String chip, String programmer, String port) {
@@ -31,6 +36,8 @@ public class AVRDude {
         this.chip = chip;
         this.programmer = programmer;
         this.port = port;
+
+        strRep = "[stopped] " + chip + " " + programmer + " " + port;
     }
 
 
@@ -48,17 +55,29 @@ public class AVRDude {
         lbuls.add(lbul);
     }
 
+    public void addProcessStopUpdateEventListener(GenericUpdateListener stop) { stops.add(stop); }
+
     public void setBaudrate(String baudrate) {
         this.baudrate = baudrate;
     }
 
     public void setBitclock(String bitclock) { this.bitclock = bitclock; }
 
+    @Override
+    public String toString() {
+        return strRep;
+    }
+
     public void run(ArrayList<String> parameters) {
         run(parameters, new File(avrdudePath).getParentFile());
     }
 
     public void run(ArrayList<String> parameters, File envDir) {
+        if(!envDir.exists()) {
+            ErrorHandler.alert("The specified folder doesn't exist.", "Please check the path to the input/output file.");
+            return;
+        }
+
         Runtime r = Runtime.getRuntime();
 
         ArrayList<String> call = new ArrayList<>();
@@ -86,6 +105,23 @@ public class AVRDude {
 
         try {
             Process avrdude = r.exec(Arrays.copyOf(call.toArray(), call.toArray().length, String[].class), null, envDir);
+            process = avrdude; // Set the object link
+            strRep = "[running] " + chip + " " + programmer + " " + port;
+
+            Task detectProcessEnd = new Task<Void>() {
+                @Override protected Void call() throws Exception {
+                    avrdude.waitFor();
+                    strRep = "[stopped] " + chip + " " + programmer + " " + port;
+
+                    for(GenericUpdateListener stop : stops)
+                        stop.update();
+
+                    return null;
+                }
+            };
+            Thread detectProcessEndThread = new Thread(detectProcessEnd);
+            detectProcessEndThread.setDaemon(true);
+            detectProcessEndThread.start();
 
             InputStreamReader err = new InputStreamReader(avrdude.getErrorStream());
 
@@ -161,5 +197,20 @@ public class AVRDude {
         } catch(IOException e) {
             ErrorHandler.alert("Cannot execute avrdude.", "Please check the path to the avrdude binary.");
         }
+    }
+
+    public void sendCommand(String command) throws IOException {
+        OutputStream os = process.getOutputStream();
+        BufferedWriter bfw = new BufferedWriter(new OutputStreamWriter(os));
+
+        bfw.write(command);
+        bfw.newLine();
+
+        bfw.close();
+    }
+
+    public void killProcess() {
+        if(process.isAlive())
+            process.destroy();
     }
 }
