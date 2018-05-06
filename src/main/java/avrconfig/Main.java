@@ -29,7 +29,7 @@ public class Main extends Application {
             configurationFile = getParameters().getNamed().get("config");
         }
         Parent root = fxmlLoader.load();
-        primaryStage.setTitle("AVRConfig");
+        primaryStage.setTitle("AVRConfig 0.2-beta");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
