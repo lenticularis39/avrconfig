@@ -1,11 +1,12 @@
 package avrconfig.serial;
 
 import avrconfig.error.ErrorHandler;
-import javafx.application.Platform;
+import avrconfig.util.TextUpdateListener;
 import javafx.concurrent.Task;
-import javafx.scene.text.Text;
 
+import javax.xml.soap.Text;
 import java.io.*;
+import java.util.Vector;
 
 /**
  * Created by tglozar on 20.8.17.
@@ -15,15 +16,16 @@ public class Serial implements SerialController {
     String filename;
     FileInputStream serialInputStream;
     BufferedReader serialInput;
-    Text tf;
 
     Task outputCatching;
     boolean taskFlag = true;
 
-    public Serial(String filename, int baudrate, Text tf) throws IOException {
+    private Vector<TextUpdateListener> outputUpdaters = new Vector<>(1);
+
+    public Serial(String filename, int baudrate) throws IOException {
         this.baudrate = baudrate;
-        this.tf = tf;
         this.filename = filename;
+
         serialInputStream = new FileInputStream(filename);
         serialInput = new BufferedReader(new InputStreamReader(serialInputStream));
 
@@ -62,9 +64,8 @@ public class Serial implements SerialController {
                         if (serialInput.ready()) {
                             String line = serialInput.readLine();
                             if(line != null)
-                                Platform.runLater(() -> {
-                                    tf.setText(tf.getText() + line + "\n");
-                                });
+                                for(TextUpdateListener outputUpdater : outputUpdaters)
+                                    outputUpdater.updateText(line);
                         }
                     } catch(IOException ie) {}
                 }
@@ -87,5 +88,9 @@ public class Serial implements SerialController {
 
     public void closeStream() throws IOException {
         serialInputStream.close();
+    }
+
+    public void addOutputUpdater(TextUpdateListener tul) {
+        outputUpdaters.add(tul);
     }
 }

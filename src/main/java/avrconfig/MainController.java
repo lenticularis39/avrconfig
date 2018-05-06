@@ -15,6 +15,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.*;
 
@@ -43,6 +44,12 @@ public class MainController {
     public ListView<Integer> verboseListView;
     @FXML
     public ListView<AVRDude> avrdudeProcessList;
+    @FXML
+    public Button killProcessButton;
+    @FXML
+    public Button sendTextToAvrdudeButton;
+    @FXML
+    public CheckBox showStoppedProcessesCheckBox;
 
     // Flash page
     @FXML
@@ -110,6 +117,8 @@ public class MainController {
     @FXML
     public Text serialOutput;
     @FXML
+    public ScrollPane serialOutputScrollPane;
+    @FXML
     public TextField serialPort;
     @FXML
     public TextField serialBaudrate;
@@ -129,6 +138,7 @@ public class MainController {
     Serial serial;
 
     ObservableList<AVRDude> avrdudeProcesses = FXCollections.observableArrayList();
+    ObservableList<AVRDude> avrdudeRunningProcesses = FXCollections.observableArrayList();
 
     public MainController() {
         super();
@@ -214,6 +224,12 @@ public class MainController {
         ObservableList<Integer> verboseModes = FXCollections.observableArrayList(0, 1, 2, 3, 4);
         verboseListView.setItems(verboseModes);
         verboseListView.getSelectionModel().select(new Integer(0));
+
+        // Set serial font
+        if(serialUseMonospaceFont.isSelected())
+            serialOutput.setFont(Font.font("Monospaced"));
+        else
+            serialOutput.setFont(Font.getDefault());
     }
 
 
@@ -298,13 +314,25 @@ public class MainController {
 
     private AVRDude getAvrDude(Text text) {
         AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText());
+
         avrdudeProcesses.add(avrDude);
-        avrdudeProcessList.setItems(avrdudeProcesses);
+        avrdudeRunningProcesses.add(avrDude);
+
+        if(!showStoppedProcessesCheckBox.isSelected())
+            avrdudeProcessList.setItems(avrdudeRunningProcesses);
+        else
+            avrdudeProcessList.setItems(avrdudeProcesses);
+
         avrDude.addOutputUpdateEventListener((newText) -> Platform.runLater(() -> text.setText(text.getText()  + newText)));
-        avrDude.addProcessStopUpdateEventListener(() -> Platform.runLater(() -> {
+        avrDude.addProcessStopUpdateEventListener((stoppedAvrDude) -> Platform.runLater(() -> {
+            avrdudeRunningProcesses.removeAll(stoppedAvrDude);
+
             avrdudeProcessList.refresh();
+            updateProcessButtons();
         }));
+
         if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(baudrateTextField.getText());
+
         return avrDude;
     }
 
@@ -630,6 +658,18 @@ public class MainController {
         avrDude.run(parameters);
     }
 
+    public void updateProcessButtons() {
+        if(avrdudeProcessList.getSelectionModel().getSelectedItems().size() > 0 &&
+           avrdudeProcessList.getSelectionModel().getSelectedItem().toString().startsWith("[running]")) {
+            killProcessButton.setDisable(false);
+            sendTextToAvrdudeButton.setDisable(false);
+        }
+        else {
+            killProcessButton.setDisable(true);
+            sendTextToAvrdudeButton.setDisable(true);
+        }
+    }
+
     public void sendTextToAvrdudeButtonClicked() {
         TextInputDialog tid = new TextInputDialog();
         tid.setTitle("Send text to avrdude");
@@ -652,12 +692,28 @@ public class MainController {
         avrDude.killProcess();
     }
 
+    public void showStoppedProcessesCheckBoxClicked() {
+        if(!showStoppedProcessesCheckBox.isSelected())
+            avrdudeProcessList.setItems(avrdudeRunningProcesses);
+        else
+            avrdudeProcessList.setItems(avrdudeProcesses);
+
+        updateProcessButtons();
+    }
+
     public void startOrStopSerial() {
         if(serial == null) {
             // Turn on serial
 
             try {
-                serial = new Serial(serialPort.getText(), Integer.parseInt(serialBaudrate.getText()), serialOutput);
+                serial = new Serial(serialPort.getText(), Integer.parseInt(serialBaudrate.getText()));
+                serial.addOutputUpdater((String line) -> Platform.runLater(() -> {
+                    serialOutput.setText(serialOutput.getText() + line + "\n");
+
+                    if(serialAutoScroll.isSelected())
+                        serialOutputScrollPane.setVvalue(1.0);
+                }));
+
                 serial.start();
                 turnSerialOn.setText("Disable serial");
             } catch (IOException ie) {
@@ -677,6 +733,13 @@ public class MainController {
             serial = null;
             turnSerialOn.setText("Enable serial");
         }
+    }
+
+    public void serialUseMonospaceFontClicked() {
+        if(serialUseMonospaceFont.isSelected())
+            serialOutput.setFont(Font.font("Monospaced"));
+        else
+            serialOutput.setFont(Font.getDefault());
     }
 
     public void clearSerialOutput() {

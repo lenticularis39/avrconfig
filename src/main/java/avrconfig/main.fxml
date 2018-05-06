@@ -175,7 +175,7 @@
                           <Insets left="20.0" right="20.0" />
                       </padding>
                   </HBox>
-                  <ListView fx:id="avrdudeProcessList">
+                  <ListView fx:id="avrdudeProcessList" onKeyTyped="#updateProcessButtons" onMouseClicked="#updateProcessButtons">
                       <VBox.margin>
                           <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
                       </VBox.margin>
@@ -185,16 +185,21 @@
                           <Insets top="10.0" />
                       </VBox.margin>
                       <children>
-                          <Button mnemonicParsing="false" onAction="#killProcessButtonClicked" text="Kill process">
+                          <Button fx:id="killProcessButton" disable="true" mnemonicParsing="false" onAction="#killProcessButtonClicked" text="Kill process">
                               <HBox.margin>
                                   <Insets />
                               </HBox.margin>
                           </Button>
-                          <Button mnemonicParsing="false" onAction="#sendTextToAvrdudeButtonClicked" text="Send text to process's stdin">
+                          <Button fx:id="sendTextToAvrdudeButton" disable="true" mnemonicParsing="false" onAction="#sendTextToAvrdudeButtonClicked" text="Send text to process's stdin">
                               <HBox.margin>
                                   <Insets />
                               </HBox.margin>
                           </Button>
+                        <CheckBox fx:id="showStoppedProcessesCheckBox" minHeight="26.0" mnemonicParsing="false" onAction="#showStoppedProcessesCheckBoxClicked" text="Show stopped processes">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </CheckBox>
                       </children>
                       <padding>
                           <Insets bottom="20.0" left="20.0" right="20.0" />
@@ -653,7 +658,7 @@
             </VBox>
          </content>
       </Tab>
-      <Tab text="Serial">
+      <Tab text="Serial (Linux only)">
           <content>
               <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0">
                   <padding>
@@ -692,7 +697,7 @@
                       </VBox.margin>
                      <children>
                         <CheckBox fx:id="serialClearBeforeEnabling" mnemonicParsing="false" text="Leave stream open after disabling" />
-                        <CheckBox fx:id="serialUseMonospaceFont" mnemonicParsing="false" text="Use a monospace font" />
+                        <CheckBox fx:id="serialUseMonospaceFont" mnemonicParsing="false" onAction="#serialUseMonospaceFontClicked" text="Use a monospace font" />
                         <CheckBox fx:id="serialAutoScroll" mnemonicParsing="false" text="Auto scroll" />
                      </children>
                   </HBox>
@@ -705,7 +710,7 @@
                          <Button fx:id="clearOutput" mnemonicParsing="false" onAction="#clearSerialOutput" text="Clear output" />
                      </children>
                   </HBox>
-                      <ScrollPane prefHeight="1000.0">
+                      <ScrollPane fx:id="serialOutputScrollPane" prefHeight="1000.0">
                           <VBox.margin>
                               <Insets bottom="20.0" left="20.0" right="20.0" top="5.0" />
                           </VBox.margin>

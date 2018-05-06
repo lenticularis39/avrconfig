@@ -106,15 +106,17 @@ public class AVRDude {
         try {
             Process avrdude = r.exec(Arrays.copyOf(call.toArray(), call.toArray().length, String[].class), null, envDir);
             process = avrdude; // Set the object link
-            strRep = "[running] " + chip + " " + programmer + " " + port;
+            strRep = "[running] " + call.toString();
+
+            AVRDude _this = this;
 
             Task detectProcessEnd = new Task<Void>() {
                 @Override protected Void call() throws Exception {
                     avrdude.waitFor();
-                    strRep = "[stopped] " + chip + " " + programmer + " " + port;
+                    strRep = "[stopped] " + call.toString();
 
                     for(GenericUpdateListener stop : stops)
-                        stop.update();
+                        stop.update(_this);
 
                     return null;
                 }
@@ -206,7 +208,7 @@ public class AVRDude {
         bfw.write(command);
         bfw.newLine();
 
-        bfw.close();
+        bfw.flush();
     }
 
     public void killProcess() {
@@ -214,3 +216,4 @@ public class AVRDude {
             process.destroy();
     }
 }
+
