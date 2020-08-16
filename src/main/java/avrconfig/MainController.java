@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.text.Font;
@@ -25,6 +26,22 @@ public class MainController {
     @FXML
     public Parent root;
 
+    // Pages (page titles)
+    @FXML
+    Tab setupTab;
+    @FXML
+    Tab flashMemoryTab;
+    @FXML
+    Tab eepromTab;
+    @FXML
+    Tab fuseBitsTab;
+    @FXML
+    Tab lockBitsTab;
+    @FXML
+    Tab otherTab;
+    @FXML
+    Tab serialTab;
+
     // Setup page
     @FXML
     public TextField execTextField;
@@ -32,6 +49,10 @@ public class MainController {
     public TextField configTextField;
     @FXML
     public TextField portTextField;
+    @FXML
+    public Button execBrowseButton;
+    @FXML
+    public Button configBrowseButton;
     @FXML
     public TextField baudrateTextField;
     @FXML
@@ -42,6 +63,8 @@ public class MainController {
     public ChoiceBox programmersChoiceBox;
     @FXML
     public ListView<Integer> verboseListView;
+    @FXML
+    public Button setupButton;
     @FXML
     public ListView<AVRDude> avrdudeProcessList;
     @FXML
@@ -151,7 +174,7 @@ public class MainController {
     @FXML
     public void initialize()  {
         // Set up saving configuration file on closing
-        MainController _this = this;
+        MainController self = this;
 
         Task setSave = new Task<Void>() {
             protected Void call() {
@@ -161,14 +184,14 @@ public class MainController {
                     Platform.runLater(() -> ErrorHandler.alertBug(e));
                 }
                 root.getScene().getWindow().setOnHiding(event -> {
-                    ConfigurationFile save = new ConfigurationFile(configurationFile, _this);
+                    ConfigurationFile save = new ConfigurationFile(configurationFile, self);
                     try {
                         save.save();
                     } catch(IOException e) {
                         // Cannot write to file
                         ErrorHandler.alert("Cannot save configuration file.",
                                              "AVRConfig couldn't write into the configuration file. " +
-                                                     "Please check if you have sufficient permissions.");
+                                                  "Please check if you have sufficient permissions.");
                     }
                 });
 
@@ -231,8 +254,32 @@ public class MainController {
             serialOutput.setFont(Font.font("Monospaced"));
         else
             serialOutput.setFont(Font.getDefault());
+
+        updateAvrdudeConfigurationState();
     }
 
+    private boolean isAvrdudeConfigured() {
+        return !microcontrollerChoiceBox.getItems().isEmpty() && !programmersChoiceBox.getItems().isEmpty();
+    }
+
+    private void updateAvrdudeConfigurationState() {
+        for (Tab tab : new Tab[]{flashMemoryTab, eepromTab, fuseBitsTab, lockBitsTab, otherTab}) {
+            tab.setDisable(!isAvrdudeConfigured());
+        }
+
+        for (Node node : new Node[]{microcontrollerChoiceBox, programmersChoiceBox, portTextField, baudrateTextField,
+                                    bitclockTextField, verboseListView}) {
+            node.setDisable(!isAvrdudeConfigured());
+        }
+
+        for (Node node : new Node[]{execTextField, configTextField, execBrowseButton, configBrowseButton}) {
+            node.setDisable(isAvrdudeConfigured());
+        }
+
+        setupButton.setText(isAvrdudeConfigured()
+                                ? "Reset avrdude configuration"
+                                : "Parse avrdude.conf and load data");
+    }
 
     public void updateLists() {
         ObservableList<String> chipsDescriptions = FXCollections.observableArrayList();
@@ -283,31 +330,39 @@ public class MainController {
     }
 
     public void setupButtonClicked() {
-        // First check if the files exist
-        File avrdudeExe = new File(execTextField.getText());
-        File avrdudeConfig = new File(configTextField.getText());
+        if (!isAvrdudeConfigured()) {
+            // Act as setup button
+            File avrdudeExe = new File(execTextField.getText());
+            File avrdudeConfig = new File(configTextField.getText());
 
-        if (!avrdudeExe.exists() || !avrdudeExe.canExecute()) {
-            ErrorHandler.alert("Cannot find or execute avrdude.", "The file " + execTextField.getText() +
-                               " either does not exist, or cannot be executed.");
-            return;
-        } else if (!avrdudeConfig.exists()) {
-            ErrorHandler.alert("Cannot find avrdude configuration file.",
-                           "The file " + configTextField.getText() + " has not been found.");
-            return;
+            if (!avrdudeExe.exists() || !avrdudeExe.canExecute()) {
+                ErrorHandler.alert("Cannot find or execute avrdude.", "The file " + execTextField.getText() +
+                        " either does not exist, or cannot be executed.");
+                return;
+            } else if (!avrdudeConfig.exists()) {
+                ErrorHandler.alert("Cannot find avrdude configuration file.",
+                        "The file " + configTextField.getText() + " has not been found.");
+                return;
+            }
+
+            try {
+                ConfigParser cp = new ConfigParser(avrdudeConfig);
+                chips = cp.parse("part");
+                programmers = cp.parse("programmer");
+
+                updateLists();
+                Platform.runLater(() -> updateAvrdudeConfigurationState());
+            } catch (IOException e) {
+                ErrorHandler.alert("Cannot read avrdude configuration file.",
+                        "The filesystem is no longer available or corrupted" +
+                                " (or the folder does not exist).");
+            }
+        } else {
+            // Act as reset button
+            microcontrollerChoiceBox.setItems(FXCollections.observableArrayList());
+            programmersChoiceBox.setItems(FXCollections.observableArrayList());
+            Platform.runLater(() -> updateAvrdudeConfigurationState());
         }
-
-        try {
-            ConfigParser cp = new ConfigParser(avrdudeConfig);
-            chips = cp.parse("part");
-            programmers = cp.parse("programmer");
-        } catch(IOException e) {
-            ErrorHandler.alert("Cannot read avrdude configuration file.",
-                               "The filesystem is no longer available or corrupted" +
-                                    " (or the folder does not exist).");
-        }
-
-        updateLists();
     }
 
     public void addVerboseOutput(ArrayList<String> parameters) {

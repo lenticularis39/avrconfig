@@ -19,7 +19,7 @@
          prefHeight="537.0" prefWidth="764.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.112"
          xmlns:fx="http://javafx.com/fxml/1" fx:controller="avrconfig.MainController">
   <tabs>
-    <Tab text="Setup">
+    <Tab text="Setup" fx:id="setupTab">
       <content>
           <VBox maxHeight="Infinity" maxWidth="Infinity" spacing="5.0">
               <children>
@@ -35,7 +35,8 @@
                               <Insets right="10.0" />
                            </HBox.margin>
                         </TextField>
-                        <Button mnemonicParsing="false" onMouseClicked="#execButtonClicked" text="Browse" />
+                        <Button fx:id="execBrowseButton" mnemonicParsing="false" onMouseClicked="#execButtonClicked"
+                                text="Browse" />
                      </children>
                      <padding>
                         <Insets left="20.0" right="20.0" />
@@ -59,7 +60,8 @@
                                   <Insets right="10.0" />
                               </HBox.margin>
                           </TextField>
-                          <Button mnemonicParsing="false" onMouseClicked="#configButtonClicked" text="Browse" />
+                          <Button fx:id="configBrowseButton" mnemonicParsing="false"
+                                  onMouseClicked="#configButtonClicked" text="Browse" />
                       </children>
                       <padding>
                           <Insets left="20.0" right="20.0" />
@@ -170,8 +172,7 @@
                           <Insets top="10.0" />
                       </VBox.margin>
                       <children>
-                          <Button mnemonicParsing="false" onMouseClicked="#setupButtonClicked"
-                                  text="Parse avrdude.conf and load data">
+                          <Button fx:id="setupButton" mnemonicParsing="false" onMouseClicked="#setupButtonClicked">
                               <HBox.margin>
                                   <Insets />
                               </HBox.margin>
@@ -223,7 +224,7 @@
 
       </content>
     </Tab>
-      <Tab text="Flash memory">
+      <Tab text="Flash memory" fx:id="flashMemoryTab">
          <content>
             <VBox alignment="TOP_CENTER" maxHeight="Infinity" maxWidth="Infinity" spacing="5.0">
                <children>
@@ -317,7 +318,7 @@
             </VBox>
          </content>
       </Tab>
-      <Tab text="EEPROM">
+      <Tab text="EEPROM" fx:id="eepromTab">
          <content>
             <VBox alignment="TOP_CENTER" maxHeight="Infinity" maxWidth="Infinity" spacing="5.0">
                <children>
@@ -410,7 +411,7 @@
             </VBox>
          </content>
       </Tab>
-      <Tab text="Standard fuse bits">
+      <Tab text="Standard fuse bits" fx:id="fuseBitsTab">
          <content>
             <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
                <children>
@@ -490,7 +491,7 @@
                </children>
             </VBox>
          </content></Tab>
-     <!-- <Tab text="Single fuse &amp; fuseN bits">
+     <!-- <Tab text="Single fuse &amp; fuseN bits" fx:id="singleFuseTab">
          <content>
             <VBox alignment="CENTER" spacing="5.0">
                <children>
@@ -602,7 +603,7 @@
             </VBox>
          </content>
       </Tab> -->
-      <Tab text="Lock bits">
+      <Tab text="Lock bits" fx:id="lockBitsTab">
          <content>
             <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
                <children>
@@ -647,7 +648,7 @@
             </VBox>
          </content>
       </Tab>
-      <Tab text="Other">
+      <Tab text="Other" fx:id="otherTab">
          <content>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0">
                <padding>
@@ -679,7 +680,7 @@
             </VBox>
          </content>
       </Tab>
-      <Tab text="Serial (Linux only)">
+      <Tab text="Serial (Linux only)" fx:id="serialTab">
           <content>
               <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0">
                   <padding>
