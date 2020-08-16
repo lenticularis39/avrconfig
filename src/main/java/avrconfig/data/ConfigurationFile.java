@@ -72,8 +72,6 @@ public class ConfigurationFile {
                     if(e.hasAttribute("id") && e.getNodeName().equals("choicebox")) {
                         for(Field f : fields) {
                             if(f.getName().equals(e.getAttribute("id"))) {
-                                ((ChoiceBox)f.get(s)).setValue(getFirstLevelTextContent(e));
-
                                 // Iterate over choices and set them
                                 NodeList children = e.getChildNodes();
                                 ObservableList<String> list = FXCollections.observableArrayList();
@@ -84,6 +82,8 @@ public class ConfigurationFile {
                                 }
                                 ((ChoiceBox)f.get(s)).setItems(list);
 
+                                // Set the current choice
+                                ((ChoiceBox)f.get(s)).setValue(e.getAttribute("current-choice"));
                             }
                         }
                     }
@@ -128,10 +128,10 @@ public class ConfigurationFile {
                 // Choice boxes
                 if(f.getType().equals(ChoiceBox.class) && !f.getName().matches("readFormat.*")) {
                     Object value = ((ChoiceBox)f.get(s)).getValue();
+
                     if(value != null && !value.equals("")) {
                         Element e = xml.createElement("choicebox");
                         e.setAttribute("id", f.getName());
-                        e.appendChild(xml.createTextNode(value.toString()));
 
                         // Iterate over choices
                         ObservableList<Object> items = ((ChoiceBox)f.get(s)).getItems();
@@ -141,6 +141,9 @@ public class ConfigurationFile {
                             child.appendChild(xml.createTextNode(item.toString()));
                             e.appendChild(child);
                         }
+
+                        // Set the current choice
+                        e.setAttribute("current-choice", (String)value);
 
                         rootElement.appendChild(e);
                     }
@@ -156,7 +159,6 @@ public class ConfigurationFile {
                     if(value) {
                         rootElement.appendChild(e);
                     }
-
                 }
             }
 
