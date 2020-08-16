@@ -284,13 +284,15 @@ public class MainController {
     public void updateLists() {
         ObservableList<String> chipsDescriptions = FXCollections.observableArrayList();
         chipsDescriptions.addAll(Collections.list(chips.keys()));
-        chipsDescriptions.sort((String x, String y) -> x.compareTo(y));
+        chipsDescriptions.sort(Comparator.naturalOrder());
         microcontrollerChoiceBox.setItems(chipsDescriptions);
+        microcontrollerChoiceBox.setValue(chipsDescriptions.get(0));
 
         ObservableList<String> programmersDescriptions = FXCollections.observableArrayList();
         programmersDescriptions.addAll(Collections.list(programmers.elements()));
-        programmersDescriptions.sort((String x, String y) -> x.compareTo(y));
+        programmersDescriptions.sort(Comparator.naturalOrder());
         programmersChoiceBox.setItems(programmersDescriptions);
+        programmersChoiceBox.setValue(programmersDescriptions.get(0));
     }
 
     public void execButtonClicked() {
