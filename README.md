@@ -1,19 +1,15 @@
 # AVRConfig
-<div id="text">
-<p>AVRConfig is simple multiplatform graphical interface for the program avrdude written in JavaFX. It was developed to make working with AVR microcontrollers easier (primarily for people who don't like console). It was also developed for those who did their projects with Arduino or with other simple SW and HW and want to try programming in pure C with only classical HW. The application uses the program avrdude by Brian S. Dean.</p>
-<br>
-<b>Note: we recommend you to download and read the documentation to introduce yourself all possibilities and/or limitations of the program.</b>
-<br>
-<h1>Features</h1>
-<ul id="pouziti">
-<li>-Upload to/read from flash memory or EEPROM.</li>
-<li>-Write/read classic fuse bits.</li>
-<li>-Write/read lock bits.</li>
-<li>-Check the microcontroller connection.</li>
-<li>-Erase the whole microcontroller.</li>
-</ul>
-<h1>Building avrconfig</h1>
-<p>You need a JDK, JavaFX (i.e. either the Oracle JDK, or OpenJDK with OpenJDX) and Maven. Then you can simply run</p>
-	mvn package
-<p>to build avrconfig.</p>
 
+AVRConfig is a simple multiplatform GUI for avrdude written in JavaFX. It was created to make working with AVR microcontrollers easier (primarily for those who don't like working in the command line). It can also be used by those who previously did their projects with Arduino or another simple programming kit and now want to try programming in C.
+
+## Features
+- Upload to/read from flash memory or EEPROM
+- Write/read standard fuse bits
+- Write/read lock bits
+- Check the connection to the microcontroller
+- Erase the contents of the microcontroller
+
+## Building avrconfig
+AVRConfig requires JDK 11 and Maven. If both is set up right, this should suffice to build it:
+
+	mvn package
