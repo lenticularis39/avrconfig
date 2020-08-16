@@ -4,7 +4,6 @@ import avrconfig.error.ErrorHandler;
 import avrconfig.util.TextUpdateListener;
 import javafx.concurrent.Task;
 
-import javax.xml.soap.Text;
 import java.io.*;
 import java.util.Vector;
 
