@@ -22,6 +22,9 @@ import javafx.stage.*;
 
 public class MainController {
     public String configurationFile = System.getProperty("user.home") + "/.config/avrconfig/config.xml";
+    private String setupButtonUnconfiguredText = "Parse avrdude.conf and load data";
+    private String setupButtonConfiguredText = "Reset avrdude configuration";
+    private String setupButtonInProgressText = "Parsing avrdude configuration...";
 
     @FXML
     public Parent root;
@@ -276,23 +279,25 @@ public class MainController {
             node.setDisable(isAvrdudeConfigured());
         }
 
-        setupButton.setText(isAvrdudeConfigured()
-                                ? "Reset avrdude configuration"
-                                : "Parse avrdude.conf and load data");
+        setupButton.setText(isAvrdudeConfigured() ? setupButtonConfiguredText : setupButtonUnconfiguredText);
     }
 
     public void updateLists() {
         ObservableList<String> chipsDescriptions = FXCollections.observableArrayList();
         chipsDescriptions.addAll(Collections.list(chips.keys()));
         chipsDescriptions.sort(Comparator.naturalOrder());
-        microcontrollerChoiceBox.setItems(chipsDescriptions);
-        microcontrollerChoiceBox.setValue(chipsDescriptions.get(0));
+        Platform.runLater(() -> {
+            microcontrollerChoiceBox.setItems(chipsDescriptions);
+            microcontrollerChoiceBox.setValue(chipsDescriptions.get(0));
+        });
 
         ObservableList<String> programmersDescriptions = FXCollections.observableArrayList();
         programmersDescriptions.addAll(Collections.list(programmers.elements()));
         programmersDescriptions.sort(Comparator.naturalOrder());
-        programmersChoiceBox.setItems(programmersDescriptions);
-        programmersChoiceBox.setValue(programmersDescriptions.get(0));
+        Platform.runLater(() -> {
+            programmersChoiceBox.setItems(programmersDescriptions);
+            programmersChoiceBox.setValue(programmersDescriptions.get(0));
+        });
     }
 
     public void execButtonClicked() {
@@ -347,18 +352,36 @@ public class MainController {
                 return;
             }
 
-            try {
-                ConfigParser cp = new ConfigParser(avrdudeConfig);
-                chips = cp.parse("part");
-                programmers = cp.parse("programmer");
+            // Parse the configuration file.
+            // Note: this can take a while, therefore it is performed asynchronously.
+            new Thread(() -> {
+                try {
+                    Platform.runLater(() -> {
+                        setupButton.setDisable(true);
+                        setupButton.setText(setupButtonInProgressText);
+                    });
 
-                updateLists();
-                Platform.runLater(() -> updateAvrdudeConfigurationState());
-            } catch (IOException e) {
-                ErrorHandler.alert("Cannot read avrdude configuration file.",
-                        "The filesystem is no longer available or corrupted" +
-                                " (or the folder does not exist).");
-            }
+                    ConfigParser cp = new ConfigParser(avrdudeConfig);
+                    chips = cp.parse("part");
+                    programmers = cp.parse("programmer");
+
+                    updateLists();
+
+                    Platform.runLater(() -> {
+                        updateAvrdudeConfigurationState();
+                        setupButton.setText(setupButtonConfiguredText);
+                    });
+                } catch (IOException e) {
+                    Platform.runLater(() -> {
+                        ErrorHandler.alert("Cannot read avrdude configuration file.",
+                                             "The filesystem is no longer available or corrupted " +
+                                                  "(or the folder does not exist).");
+                        setupButton.setText(setupButtonUnconfiguredText);
+                    });
+                } finally {
+                    Platform.runLater(() -> setupButton.setDisable(false));
+                }
+            }).start();
         } else {
             // Act as reset button
             microcontrollerChoiceBox.setItems(FXCollections.observableArrayList());
