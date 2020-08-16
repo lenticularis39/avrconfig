@@ -15,7 +15,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<TabPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="537.0" prefWidth="764.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="avrconfig.MainController">
+<TabPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+         prefHeight="537.0" prefWidth="764.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.112"
+         xmlns:fx="http://javafx.com/fxml/1" fx:controller="avrconfig.MainController">
   <tabs>
     <Tab text="Setup">
       <content>
@@ -76,7 +78,8 @@
                                   <Insets right="10.0" />
                               </HBox.margin>
                           </Label>
-                          <ChoiceBox fx:id="microcontrollerChoiceBox" maxWidth="Infinity" prefWidth="150.0" HBox.hgrow="ALWAYS" />
+                          <ChoiceBox fx:id="microcontrollerChoiceBox" maxWidth="Infinity" prefWidth="150.0"
+                                     HBox.hgrow="ALWAYS" />
                       </children></HBox>
                   <HBox alignment="CENTER">
                       <VBox.margin>
@@ -91,7 +94,8 @@
                                   <Insets right="10.0" />
                               </HBox.margin>
                           </Label>
-                          <ChoiceBox fx:id="programmersChoiceBox" maxWidth="Infinity" prefWidth="150.0" HBox.hgrow="ALWAYS" />
+                          <ChoiceBox fx:id="programmersChoiceBox" maxWidth="Infinity" prefWidth="150.0"
+                                     HBox.hgrow="ALWAYS" />
                       </children></HBox>
                   <HBox alignment="CENTER">
                       <VBox.margin>
@@ -154,7 +158,8 @@
                               <Insets right="10.0" />
                            </HBox.margin>
                         </Label>
-                        <ListView fx:id="verboseListView" orientation="HORIZONTAL" prefHeight="21.0" prefWidth="394.0" HBox.hgrow="ALWAYS" />
+                        <ListView fx:id="verboseListView" orientation="HORIZONTAL" prefHeight="21.0" prefWidth="394.0"
+                                  HBox.hgrow="ALWAYS" />
                      </children>
                      <padding>
                         <Insets left="20.0" right="20.0" />
@@ -165,7 +170,8 @@
                           <Insets top="10.0" />
                       </VBox.margin>
                       <children>
-                          <Button mnemonicParsing="false" onMouseClicked="#setupButtonClicked" text="Parse avrdude.conf and load data">
+                          <Button mnemonicParsing="false" onMouseClicked="#setupButtonClicked"
+                                  text="Parse avrdude.conf and load data">
                               <HBox.margin>
                                   <Insets />
                               </HBox.margin>
@@ -175,7 +181,8 @@
                           <Insets left="20.0" right="20.0" />
                       </padding>
                   </HBox>
-                  <ListView fx:id="avrdudeProcessList" onKeyTyped="#updateProcessButtons" onMouseClicked="#updateProcessButtons">
+                  <ListView fx:id="avrdudeProcessList" onKeyTyped="#updateProcessButtons"
+                            onMouseClicked="#updateProcessButtons">
                       <VBox.margin>
                           <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
                       </VBox.margin>
@@ -185,17 +192,20 @@
                           <Insets top="10.0" />
                       </VBox.margin>
                       <children>
-                          <Button fx:id="killProcessButton" disable="true" mnemonicParsing="false" onAction="#killProcessButtonClicked" text="Kill process">
+                          <Button fx:id="killProcessButton" disable="true" mnemonicParsing="false"
+                                  onAction="#killProcessButtonClicked" text="Kill process">
                               <HBox.margin>
                                   <Insets />
                               </HBox.margin>
                           </Button>
-                          <Button fx:id="sendTextToAvrdudeButton" disable="true" mnemonicParsing="false" onAction="#sendTextToAvrdudeButtonClicked" text="Send text to process's stdin">
+                          <Button fx:id="sendTextToAvrdudeButton" disable="true" mnemonicParsing="false"
+                                  onAction="#sendTextToAvrdudeButtonClicked" text="Send text to process's stdin">
                               <HBox.margin>
                                   <Insets />
                               </HBox.margin>
                           </Button>
-                        <CheckBox fx:id="showStoppedProcessesCheckBox" minHeight="26.0" mnemonicParsing="false" onAction="#showStoppedProcessesCheckBoxClicked" text="Show stopped processes">
+                        <CheckBox fx:id="showStoppedProcessesCheckBox" minHeight="26.0" mnemonicParsing="false"
+                                  onAction="#showStoppedProcessesCheckBoxClicked" text="Show stopped processes">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -284,7 +294,8 @@
                   </HBox>
                   <HBox spacing="5.0">
                      <children>
-                        <CheckBox fx:id="overrideSignatureCheckBox" mnemonicParsing="false" text="Override signature check" />
+                        <CheckBox fx:id="overrideSignatureCheckBox" mnemonicParsing="false"
+                                  text="Override signature check" />
                         <CheckBox fx:id="notEraseCheckbox" mnemonicParsing="false" text="Disable auto erase" />
                      </children>
                      <VBox.margin>
@@ -377,7 +388,8 @@
                   </HBox>
                   <HBox>
                      <children>
-                        <CheckBox fx:id="overrideSignatureCheckBoxEEPROM" mnemonicParsing="false" text="Override signature check" />
+                        <CheckBox fx:id="overrideSignatureCheckBoxEEPROM" mnemonicParsing="false"
+                                  text="Override signature check" />
                      </children>
                      <VBox.margin>
                         <Insets left="20.0" right="20.0" top="5.0" />
@@ -455,9 +467,12 @@
                               <Insets bottom="10.0" top="10.0" />
                            </padding>
                            <children>
-                              <Button mnemonicParsing="false" onMouseClicked="#readFusesButtonClicked" text="Read fuse bits" />
-                              <Button mnemonicParsing="false" onMouseClicked="#writeFusesButtonClicked" text="Write fuse bits" />
-                              <CheckBox fx:id="overrideSignatureCheckBoxClassicF" alignment="TOP_CENTER" mnemonicParsing="false" text="Override signature check" />
+                              <Button mnemonicParsing="false" onMouseClicked="#readFusesButtonClicked"
+                                      text="Read fuse bits" />
+                              <Button mnemonicParsing="false" onMouseClicked="#writeFusesButtonClicked"
+                                      text="Write fuse bits" />
+                              <CheckBox fx:id="overrideSignatureCheckBoxClassicF" alignment="TOP_CENTER"
+                                        mnemonicParsing="false" text="Override signature check" />
                            </children></VBox>
                     </items>
                      <VBox.margin>
@@ -609,9 +624,12 @@
                         <Insets left="20.0" right="20.0" />
                      </padding>
                      <children>
-                        <Button mnemonicParsing="false" onMouseClicked="#readLockBitsButtonClicked" text="Read lock bits" />
-                        <Button mnemonicParsing="false" onMouseClicked="#writeLockBitsButtonClicked" text="Write lock bits" />
-                        <CheckBox fx:id="overrideSignatureCheckLock" mnemonicParsing="false" text="Override signature check" />
+                        <Button mnemonicParsing="false" onMouseClicked="#readLockBitsButtonClicked"
+                                text="Read lock bits" />
+                        <Button mnemonicParsing="false" onMouseClicked="#writeLockBitsButtonClicked"
+                                text="Write lock bits" />
+                        <CheckBox fx:id="overrideSignatureCheckLock" mnemonicParsing="false"
+                                  text="Override signature check" />
                      </children>
                   </HBox>
                   <ScrollPane prefHeight="2000000.0" prefWidth="200.0">
@@ -638,9 +656,12 @@
                <children>
                   <HBox alignment="CENTER_LEFT" spacing="5.0">
                      <children>
-                        <Button mnemonicParsing="false" onMouseClicked="#checkConnectionButtonClicked" text="Check connection" />
-                        <Button mnemonicParsing="false" onMouseClicked="#eraseButtonClicked" text="Erase flash, EEPROM and lock bits" />
-                        <CheckBox fx:id="overrideSignatureCheckOther" mnemonicParsing="false" text="Override signature check" />
+                        <Button mnemonicParsing="false" onMouseClicked="#checkConnectionButtonClicked"
+                                text="Check connection" />
+                        <Button mnemonicParsing="false" onMouseClicked="#eraseButtonClicked"
+                                text="Erase flash, EEPROM and lock bits" />
+                        <CheckBox fx:id="overrideSignatureCheckOther" mnemonicParsing="false"
+                                  text="Override signature check" />
                      </children>
                      <VBox.margin>
                         <Insets left="20.0" right="20.0" />
@@ -696,8 +717,10 @@
                           <Insets left="20.0" right="20.0" top="5.0" />
                       </VBox.margin>
                      <children>
-                        <CheckBox fx:id="serialClearBeforeEnabling" mnemonicParsing="false" text="Leave stream open after disabling" />
-                        <CheckBox fx:id="serialUseMonospaceFont" mnemonicParsing="false" onAction="#serialUseMonospaceFontClicked" text="Use a monospace font" />
+                        <CheckBox fx:id="serialClearBeforeEnabling" mnemonicParsing="false"
+                                  text="Leave stream open after disabling" />
+                        <CheckBox fx:id="serialUseMonospaceFont" mnemonicParsing="false"
+                                  onAction="#serialUseMonospaceFontClicked" text="Use a monospace font" />
                         <CheckBox fx:id="serialAutoScroll" mnemonicParsing="false" text="Auto scroll" />
                      </children>
                   </HBox>
@@ -706,8 +729,10 @@
                           <Insets left="20.0" right="20.0" top="5.0" />
                       </VBox.margin>
                      <children>
-                         <Button fx:id="turnSerialOn" mnemonicParsing="false" onAction="#startOrStopSerial" text="Enable serial" />
-                         <Button fx:id="clearOutput" mnemonicParsing="false" onAction="#clearSerialOutput" text="Clear output" />
+                         <Button fx:id="turnSerialOn" mnemonicParsing="false" onAction="#startOrStopSerial"
+                                 text="Enable serial" />
+                         <Button fx:id="clearOutput" mnemonicParsing="false" onAction="#clearSerialOutput"
+                                 text="Clear output" />
                      </children>
                   </HBox>
                       <ScrollPane fx:id="serialOutputScrollPane" prefHeight="1000.0">

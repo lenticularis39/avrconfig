@@ -166,8 +166,9 @@ public class MainController {
                         save.save();
                     } catch(IOException e) {
                         // Cannot write to file
-                        ErrorHandler.alert("Cannot save configuration file.", "AVRConfig couldn't write into the configuration file. " +
-                                "Please check if you have sufficient permissions.");
+                        ErrorHandler.alert("Cannot save configuration file.",
+                                             "AVRConfig couldn't write into the configuration file. " +
+                                                     "Please check if you have sufficient permissions.");
                     }
                 });
 
@@ -202,7 +203,7 @@ public class MainController {
         }
         catch(IOException ie) {
             ErrorHandler.alert("Cannot load configuration file.", "config.xml exists, but cannot be read. " +
-                    "The filesystem is no longer available or corrupted.");
+                               "The filesystem is no longer available or corrupted.");
         }
 
         // Set read formats
@@ -288,10 +289,11 @@ public class MainController {
 
         if (!avrdudeExe.exists() || !avrdudeExe.canExecute()) {
             ErrorHandler.alert("Cannot find or execute avrdude.", "The file " + execTextField.getText() +
-                    " either does not exist, or cannot be executed.");
+                               " either does not exist, or cannot be executed.");
             return;
         } else if (!avrdudeConfig.exists()) {
-            ErrorHandler.alert("Cannot find avrdude configuration file.", "The file " + configTextField.getText() + " has not been found.");
+            ErrorHandler.alert("Cannot find avrdude configuration file.",
+                           "The file " + configTextField.getText() + " has not been found.");
             return;
         }
 
@@ -300,20 +302,26 @@ public class MainController {
             chips = cp.parse("part");
             programmers = cp.parse("programmer");
         } catch(IOException e) {
-            ErrorHandler.alert("Cannot read avrdude configuration file.", "The filesystem is no longer available or corrupted (or the folder does not exist).");
+            ErrorHandler.alert("Cannot read avrdude configuration file.",
+                               "The filesystem is no longer available or corrupted" +
+                                    " (or the folder does not exist).");
         }
 
         updateLists();
     }
 
     public void addVerboseOutput(ArrayList<String> parameters) {
-        for (char a=0; a < verboseListView.getSelectionModel().getSelectedItem(); a++) {
+        for (char a = 0; a < verboseListView.getSelectionModel().getSelectedItem(); a++) {
             parameters.add("-v");
         }
     }
 
     private AVRDude getAvrDude(Text text) {
-        AVRDude avrDude = new AVRDude(execTextField.getText(), configTextField.getText(), (String)microcontrollerChoiceBox.getValue(), (String)programmersChoiceBox.getValue(), portTextField.getText());
+        AVRDude avrDude = new AVRDude(execTextField.getText(),
+                                      configTextField.getText(),
+                                      (String)microcontrollerChoiceBox.getValue(),
+                                      (String)programmersChoiceBox.getValue(),
+                                      portTextField.getText());
 
         avrdudeProcesses.add(avrDude);
         avrdudeRunningProcesses.add(avrDude);
@@ -323,7 +331,8 @@ public class MainController {
         else
             avrdudeProcessList.setItems(avrdudeProcesses);
 
-        avrDude.addOutputUpdateEventListener((newText) -> Platform.runLater(() -> text.setText(text.getText()  + newText)));
+        avrDude.addOutputUpdateEventListener((newText) -> Platform.runLater(() -> text.setText(text.getText() +
+                                                                                               newText)));
         avrDude.addProcessStopUpdateEventListener((stoppedAvrDude) -> Platform.runLater(() -> {
             avrdudeRunningProcesses.removeAll(stoppedAvrDude);
 
@@ -331,7 +340,8 @@ public class MainController {
             updateProcessButtons();
         }));
 
-        if(!baudrateTextField.getText().equals("")) avrDude.setBaudrate(baudrateTextField.getText());
+        if(!baudrateTextField.getText().isEmpty())
+            avrDude.setBaudrate(baudrateTextField.getText());
 
         return avrDude;
     }

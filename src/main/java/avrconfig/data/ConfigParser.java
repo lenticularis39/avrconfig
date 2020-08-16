@@ -22,7 +22,10 @@ public class ConfigParser {
         boolean descFlag = false;
         String chipId = "";
         String chipName = "";
-        for (String line = avrdudeConfigReader.readLine(); avrdudeConfigReader.ready(); line = avrdudeConfigReader.readLine()) {
+
+        for (String line = avrdudeConfigReader.readLine();
+             avrdudeConfigReader.ready();
+             line = avrdudeConfigReader.readLine()) {
             // Flag-based file parsing for
             if(line.startsWith(keyword))
                 idFlag = true;

@@ -13,7 +13,9 @@ public interface ErrorHandler {
         a.setTitle("AVRConfig");
         a.setHeaderText(header);
         a.setContentText(text);
-        a.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label)node).setMinHeight(Region.USE_PREF_SIZE));
+        a.getDialogPane().getChildren().stream()
+                                       .filter(node -> node instanceof Label)
+                                       .forEach(node -> ((Label)node).setMinHeight(Region.USE_PREF_SIZE));
         a.showAndWait();
     }
 
@@ -22,7 +24,9 @@ public interface ErrorHandler {
         a.setTitle("AVRConfig");
         a.setHeaderText(header);
         a.setContentText(text);
-        a.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label)node).setMinHeight(Region.USE_PREF_SIZE));
+        a.getDialogPane().getChildren().stream()
+                                       .filter(node -> node instanceof Label)
+                                       .forEach(node -> ((Label)node).setMinHeight(Region.USE_PREF_SIZE));
         a.showAndWait();
     }
 
@@ -30,6 +34,7 @@ public interface ErrorHandler {
         StringWriter errors = new StringWriter();
         e.printStackTrace(new PrintWriter(errors));
 
-        alert("An unexpected error has occured.", "Please contact the developer.\nError message:\n" + errors.toString());
+        alert("An unexpected error has occured.",
+                "Please contact the developer.\nError message:\n" + errors.toString());
     }
 }

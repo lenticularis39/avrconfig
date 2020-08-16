@@ -110,7 +110,8 @@ public class ConfigurationFile {
             Element rootElement = xml.createElement("config");
             xml.appendChild(rootElement);
 
-            // Retrieve fields in the window using reflection, transform them into elements and add the elements to the document
+            // Retrieve fields in the window using reflection, transform them into elements and add the elements to the
+            // document.
             Field[] fields = MainController.class.getFields();
             for (Field f: fields) {
                 // Text fields

@@ -74,7 +74,8 @@ public class AVRDude {
 
     public void run(ArrayList<String> parameters, File envDir) {
         if(!envDir.exists()) {
-            ErrorHandler.alert("The specified folder doesn't exist.", "Please check the path to the input/output file.");
+            ErrorHandler.alert("The specified folder doesn't exist.",
+                               "Please check the path to the input/output file.");
             return;
         }
 
@@ -104,7 +105,8 @@ public class AVRDude {
         call.addAll(parameters);
 
         try {
-            Process avrdude = r.exec(Arrays.copyOf(call.toArray(), call.toArray().length, String[].class), null, envDir);
+            Process avrdude = r.exec(Arrays.copyOf(call.toArray(), call.toArray().length, String[].class),
+                                null, envDir);
             process = avrdude; // Set the object link
             strRep = "[running] " + call.toString();
 
