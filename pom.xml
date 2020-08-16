@@ -26,6 +26,8 @@
                     <archive>
                         <manifest>
                             <mainClass>avrconfig.Main</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                     </archive>
                 </configuration>
